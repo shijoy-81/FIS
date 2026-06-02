@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retirement Recordkeeper — Back-Office Process Map (DC, DB &amp; AI Agents)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --ink:#1a2531;--ink-soft:#3a4856;--paper:#f2ece0;--card:#fbf7ef;
+    --brass:#a9742e;--brass-bright:#c08a36;--teal:#2f6b62;--plum:#7a3b54;
+    --rule:#cdbfa6;--rule-soft:#ddd1bc;--shadow:rgba(26,37,49,.12);--ai:#1a6b3a;--ai-light:#e6f4ec;--ai-border:#6ee7b7;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:radial-gradient(120% 80% at 80% -10%,#f7f2e7 0%,transparent 55%),linear-gradient(180deg,#f2ece0 0%,#ece4d4 100%);color:var(--ink);font-family:"IBM Plex Sans",sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.4;background-image:repeating-linear-gradient(0deg,transparent 0 31px,rgba(26,37,49,.025) 31px 32px);mix-blend-mode:multiply;}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 28px;position:relative;z-index:1;}
+
+  header.mast{padding:54px 0 30px;border-bottom:2px solid var(--ink);}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--brass);font-weight:500;margin:0 0 16px;}
+  h1{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(34px,5.4vw,60px);line-height:1.02;margin:0;letter-spacing:-.015em;max-width:17ch;}
+  h1 em{font-style:italic;color:var(--brass);}
+  .sub{margin:22px 0 0;max-width:72ch;font-size:16.5px;color:var(--ink-soft);}
+  .sub b{color:var(--ink);font-weight:600;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:30px;margin-top:30px;}
+  .stat{display:flex;flex-direction:column;}
+  .stat .n{font-family:"Fraunces",serif;font-size:38px;font-weight:500;line-height:1;color:var(--ink);}
+  .stat .l{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);margin-top:7px;}
+
+  .sec-label{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-soft);margin:42px 0 18px;display:flex;align-items:center;gap:14px;}
+  .sec-label::after{content:"";flex:1;height:1px;background:var(--rule);}
+
+  .controls{position:sticky;top:0;z-index:20;margin-top:14px;background:linear-gradient(180deg,#efe7d8 78%,rgba(239,231,216,0));padding:16px 0 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+  .search{flex:1 1 300px;display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--rule);border-radius:2px;padding:11px 15px;}
+  .search:focus-within{border-color:var(--brass);}
+  .search svg{width:17px;height:17px;flex:none;stroke:var(--ink-soft);}
+  .search input{border:none;background:none;outline:none;font-family:"IBM Plex Sans";font-size:15px;width:100%;color:var(--ink);}
+  .search input::placeholder{color:#9a8f7c;}
+  .seg{display:flex;border:1.5px solid var(--ink);border-radius:2px;overflow:hidden;}
+  .seg button{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:11px 14px;border:none;background:none;color:var(--ink);cursor:pointer;transition:all .15s;}
+  .seg button.active{background:var(--ink);color:var(--paper);}
+  .btn{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:11px 15px;border:1.5px solid var(--ink);background:none;color:var(--ink);cursor:pointer;border-radius:2px;transition:all .15s;white-space:nowrap;}
+  .btn:hover{background:var(--ink);color:var(--paper);}
+  .count-note{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-soft);}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin:8px 0 60px;}
+  .domain{background:var(--card);border:1px solid var(--rule);border-radius:3px;box-shadow:0 1px 0 var(--rule-soft);overflow:hidden;align-self:start;transition:box-shadow .2s,border-color .2s;}
+  .domain.open{box-shadow:0 14px 34px -18px var(--shadow);border-color:var(--brass);}
+  .domain.hide{display:none;}
+  .domain.db{border-left:4px solid var(--plum);}.domain.ai{border-left:4px solid var(--ai);}.domain.ai .d-num{background:var(--ai);}.scope-AI{color:var(--ai);}.ai-pill{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.1em;padding:1px 6px;border-radius:2px;background:var(--ai-light);color:var(--ai);border:1px solid var(--ai-border);margin-left:6px;vertical-align:middle;}.tat-badge{font-family:"IBM Plex Mono",monospace;font-size:10px;background:#0A1931;color:#fff;padding:2px 8px;border-radius:2px;margin-left:8px;}
+  .d-head{display:flex;gap:16px;align-items:flex-start;padding:20px 22px;cursor:pointer;}
+  .d-num{font-family:"Fraunces",serif;font-size:14px;font-weight:600;color:var(--paper);background:var(--ink);width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:background .2s;}
+  .domain.open .d-num{background:var(--brass);}
+  .domain.db .d-num{background:var(--plum);}
+  .d-titles{flex:1;}
+  .scope-pill{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.14em;padding:2px 7px;border-radius:2px;border:1px solid currentColor;vertical-align:middle;margin-left:8px;}
+  .scope-DC{color:var(--teal);}
+  .scope-DB{color:var(--plum);}
+  .d-name{font-family:"Fraunces",serif;font-size:20px;font-weight:500;line-height:1.12;letter-spacing:-.01em;}
+  .d-desc{font-size:13.5px;color:var(--ink-soft);margin-top:6px;}
+  .d-tag{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:9px;display:inline-block;}
+  .chev{flex:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;margin-top:4px;transition:transform .25s;}
+  .domain.open .chev{transform:rotate(90deg);}
+  .chev svg{width:15px;height:15px;stroke:var(--ink-soft);}
+
+  .d-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease;}
+  .domain.open .d-body{grid-template-rows:1fr;}
+  .d-body-inner{overflow:hidden;}
+  ul.procs{list-style:none;margin:0;padding:0 0 8px;border-top:1px solid var(--rule-soft);}
+  li.proc{border-bottom:1px dotted var(--rule-soft);}
+  li.proc:last-child{border-bottom:none;}
+  .p-head{display:flex;gap:12px;align-items:baseline;padding:11px 22px;cursor:pointer;transition:background .15s;}
+  .p-head:hover{background:#fff;}
+  .p-head .pno{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--brass);flex:none;width:42px;}
+  .p-head .ptxt{flex:1;font-size:14px;font-weight:500;}
+  .p-head .pc{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-soft);flex:none;}
+  .p-head .pchev{flex:none;width:14px;height:14px;transition:transform .22s;}
+  li.proc.open .pchev{transform:rotate(90deg);}
+  .p-head .pchev svg{width:13px;height:13px;stroke:var(--brass);}
+
+  .flow{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease;}
+  li.proc.open .flow{grid-template-rows:1fr;}
+  .flow-inner{overflow:hidden;}
+  ol.steps{list-style:none;margin:0;padding:4px 22px 20px 30px;position:relative;}
+  ol.steps::before{content:"";position:absolute;left:43px;top:14px;bottom:30px;width:2px;background:repeating-linear-gradient(var(--rule) 0 4px,transparent 4px 8px);}
+  ol.steps li{display:flex;gap:14px;align-items:flex-start;padding:6px 0;position:relative;}
+  ol.steps li .sn{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:500;color:var(--paper);background:var(--brass);width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;z-index:1;}
+  li.proc.open .flow-inner .db-acc .sn,.domain.db ol.steps li .sn{background:var(--plum);}
+  ol.steps li .st{font-size:13.5px;color:var(--ink);padding-top:3px;}
+  ol.steps li:last-child .sn{background:var(--ink);}
+
+  mark{background:rgba(192,138,54,.32);color:inherit;border-radius:2px;padding:0 1px;}
+  .no-results{display:none;text-align:center;padding:60px 0;color:var(--ink-soft);font-family:"Fraunces",serif;font-size:22px;font-style:italic;}
+
+  footer{border-top:2px solid var(--ink);padding:34px 0 70px;}
+  .legend{display:flex;flex-wrap:wrap;gap:24px;margin-bottom:20px;}
+  .legend span{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);display:flex;align-items:center;gap:8px;}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+  .fnote{font-size:13px;color:var(--ink-soft);max-width:82ch;}
+  .fnote b{color:var(--ink);}
+
+  @media(max-width:820px){.grid{grid-template-columns:1fr;}}
+  @media print{.controls{display:none;}body::before{display:none;}.d-body,.flow{grid-template-rows:1fr!important;}.chev,.pchev{display:none;}.domain{break-inside:avoid;box-shadow:none;}}
+
+  
+  /* AI Automation tab — tile grid */
+  .ais-wrap{margin:24px 0 60px;}
+  .ais-intro{font-size:14px;color:var(--ink-soft);margin:0 0 18px;max-width:90ch;line-height:1.6;}
+  .ais-header-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;}
+  .ais-header-cell{padding:14px 18px 12px;border-radius:3px 3px 0 0;border:1px solid var(--rule);border-bottom:none;}
+  .ais-header-cell.asis{background:#fff8f4;border-top:3px solid #c04000;}
+  .ais-header-cell.reim{background:var(--ai-light);border-top:3px solid var(--teal);}
+  .ais-badge{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.16em;padding:2px 8px;border-radius:2px;display:inline-block;margin-bottom:6px;}
+  .asis-badge{color:#c04000;border:1px solid #f5c8a8;background:#fff3ec;}
+  .reimagined-badge{color:var(--teal);border:1px solid var(--ai-border);background:var(--ai-light);}
+  .ais-header-cell h2{font-family:"Fraunces",serif;font-size:18px;font-weight:500;margin:0 0 3px;color:var(--ink);}
+  .ais-header-cell p{font-size:12px;color:var(--ink-soft);margin:0;}
+  /* Each stage is a row with two equal tiles */
+  .stage-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;align-items:stretch;}
+  .tile{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:16px 18px;display:flex;flex-direction:column;}
+  .tile.asis{border-left:3px solid #c04000;}
+  .tile.reim{border-left:3px solid var(--teal);}
+  .stage-num{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--ink-soft);margin:0 0 4px;letter-spacing:.1em;text-transform:uppercase;}
+  .stage-name{font-size:13.5px;font-weight:600;color:var(--ink);margin:0 0 8px;line-height:1.3;}
+  .stage-steps{list-style:none;margin:0 0 8px;padding:0;flex:1;}
+  .stage-steps li{font-size:12.5px;color:var(--ink-soft);padding:3px 0 3px 16px;position:relative;line-height:1.5;}
+  .stage-steps li::before{content:"›";position:absolute;left:0;color:#bbb;}
+  .tile.reim .stage-steps li::before{content:"✦";color:var(--teal);}
+  .pain-tag{font-family:"IBM Plex Mono",monospace;font-size:10px;background:#fff3ec;color:#8b3a0a;border:1px solid #f5c8a8;border-radius:2px;padding:3px 8px;display:inline-block;margin-top:auto;}
+  .gain-tag{font-family:"IBM Plex Mono",monospace;font-size:10px;background:var(--ai-light);color:var(--ai);border:1px solid var(--ai-border);border-radius:2px;padding:3px 8px;display:inline-block;margin-top:auto;}
+  @media(max-width:720px){.ais-header-row,.stage-row{grid-template-columns:1fr;}}
+
+  .tabs-bar{display:flex;gap:0;border-bottom:2px solid var(--ink);margin:18px 0 0;}
+  .tab-btn{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;padding:10px 22px;border:none;background:none;color:var(--ink-soft);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;}
+  .tab-btn.active{color:var(--ink);border-bottom-color:var(--brass);font-weight:600;}
+  .tab-btn.ai-tab.active{border-bottom-color:var(--teal);}
+  .tab-panel{display:none;}.tab-panel.active{display:block;}
+  /* AI Automation tab — tile grid */
+  .ais-wrap{margin:24px 0 60px;}
+  .ais-intro{font-size:14px;color:var(--ink-soft);margin:0 0 18px;max-width:90ch;line-height:1.6;}
+  .ais-header-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;}
+  .ais-header-cell{padding:14px 18px 12px;border-radius:3px 3px 0 0;border:1px solid var(--rule);border-bottom:none;}
+  .ais-header-cell.asis{background:#fff8f4;border-top:3px solid #c04000;}
+  .ais-header-cell.reim{background:var(--ai-light);border-top:3px solid var(--teal);}
+  .ais-badge{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.16em;padding:2px 8px;border-radius:2px;display:inline-block;margin-bottom:6px;}
+  .asis-badge{color:#c04000;border:1px solid #f5c8a8;background:#fff3ec;}
+  .reimagined-badge{color:var(--teal);border:1px solid var(--ai-border);background:var(--ai-light);}
+  .ais-header-cell h2{font-family:"Fraunces",serif;font-size:18px;font-weight:500;margin:0 0 3px;color:var(--ink);}
+  .ais-header-cell p{font-size:12px;color:var(--ink-soft);margin:0;}
+  /* Each stage is a row with two equal tiles */
+  .stage-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;align-items:stretch;}
+  .tile{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:16px 18px;display:flex;flex-direction:column;}
+  .tile.asis{border-left:3px solid #c04000;}
+  .tile.reim{border-left:3px solid var(--teal);}
+  .stage-num{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--ink-soft);margin:0 0 4px;letter-spacing:.1em;text-transform:uppercase;}
+  .stage-name{font-size:13.5px;font-weight:600;color:var(--ink);margin:0 0 8px;line-height:1.3;}
+  .stage-steps{list-style:none;margin:0 0 8px;padding:0;flex:1;}
+  .stage-steps li{font-size:12.5px;color:var(--ink-soft);padding:3px 0 3px 16px;position:relative;line-height:1.5;}
+  .stage-steps li::before{content:"›";position:absolute;left:0;color:#bbb;}
+  .tile.reim .stage-steps li::before{content:"✦";color:var(--teal);}
+  .pain-tag{font-family:"IBM Plex Mono",monospace;font-size:10px;background:#fff3ec;color:#8b3a0a;border:1px solid #f5c8a8;border-radius:2px;padding:3px 8px;display:inline-block;margin-top:auto;}
+  .gain-tag{font-family:"IBM Plex Mono",monospace;font-size:10px;background:var(--ai-light);color:var(--ai);border:1px solid var(--ai-border);border-radius:2px;padding:3px 8px;display:inline-block;margin-top:auto;}
+  @media(max-width:720px){.ais-header-row,.stage-row{grid-template-columns:1fr;}}
+
+  /* Process Flow tab */
+  .tab-btn.flow-tab.active{border-bottom-color:var(--plum);}
+  .pf-wrap{margin:28px 0 60px;}
+  .pf-section-title{font-family:"Fraunces",serif;font-size:22px;font-weight:500;color:var(--ink);margin:0 0 6px;}
+  .pf-section-sub{font-size:13px;color:var(--ink-soft);margin:0 0 24px;}
+  .pf-divider{border:none;border-top:2px solid var(--rule);margin:40px 0 36px;}
+  /* Swimlane container */
+  .swimlane-wrap{overflow-x:auto;margin-bottom:8px;}
+  .swimlane{display:grid;min-width:900px;}
+  .swimlane-header{display:grid;grid-template-columns:140px repeat(9,1fr);gap:0;border-bottom:2px solid var(--ink);}
+  .sl-corner{padding:10px 12px;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;color:var(--ink-soft);text-transform:uppercase;border-right:1px solid var(--rule);}
+  .sl-stage-head{padding:10px 8px;text-align:center;border-right:1px dotted var(--rule-soft);}
+  .sl-stage-head:last-child{border-right:none;}
+  .sl-stage-head .sn{font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--ink-soft);letter-spacing:.1em;display:block;margin-bottom:3px;}
+  .sl-stage-head .sl{font-size:12px;font-weight:600;color:var(--ink);line-height:1.3;}
+  /* Swimlane rows */
+  .sl-row{display:grid;grid-template-columns:140px repeat(9,1fr);gap:0;border-bottom:1px solid var(--rule-soft);}
+  .sl-row:last-child{border-bottom:none;}
+  .sl-lane-label{padding:10px 12px;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);border-right:1px solid var(--rule);display:flex;align-items:flex-start;background:var(--card);}
+  .sl-cell{padding:8px 8px;border-right:1px dotted var(--rule-soft);font-size:11.5px;color:var(--ink-soft);line-height:1.4;vertical-align:top;}
+  .sl-cell:last-child{border-right:none;}
+  .sl-cell.active{background:var(--card);color:var(--ink);}
+  .sl-cell.ai-active{background:var(--ai-light);color:#0a3d2e;}
+  .sl-cell.pain-active{background:#fff8f4;}
+  .sl-cell ul{list-style:none;margin:0;padding:0;}
+  .sl-cell ul li{padding:2px 0 2px 12px;position:relative;}
+  .sl-cell ul li::before{content:"·";position:absolute;left:0;color:var(--brass);}
+  .sl-cell.ai-active ul li::before{content:"✦";color:var(--teal);}
+  .pain-node{font-family:"IBM Plex Mono",monospace;font-size:9.5px;background:#fff3ec;color:#8b3a0a;border:1px solid #f5c8a8;border-radius:2px;padding:2px 6px;display:inline-block;margin-top:4px;}
+  .gain-node{font-family:"IBM Plex Mono",monospace;font-size:9.5px;background:var(--ai-light);color:var(--ai);border:1px solid var(--ai-border);border-radius:2px;padding:2px 6px;display:inline-block;margin-top:4px;}
+  .sl-row.highlight-row .sl-lane-label{color:var(--ink);font-weight:600;}
+  /* Arrow connector row */
+  .sl-arrow-row{display:grid;grid-template-columns:140px repeat(9,1fr);gap:0;padding:4px 0;}
+  .sl-arrow-cell{text-align:center;font-size:16px;color:var(--rule);position:relative;}
+  .sl-arrow-cell::after{content:"▼";font-size:10px;color:var(--rule);}
+  .sl-arrow-cell.ai-arr::after{color:var(--teal);}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+    <p class="eyebrow">Defined Contribution · Defined Benefit · AI Agent Opportunities · Process Inventory with Flows</p>
+    <h1>The Retirement <em>Recordkeeper</em> Back-Office Process Map</h1>
+    <p class="sub">An end-to-end catalogue of the operational processes inside a U.S. retirement recordkeeper / plan administrator — spanning <b>defined-contribution</b> (401(k), 403(b), 457), <b>defined-benefit</b> administration, and a new <b>AI Agent Opportunities layer</b> identifying where retrieval-governed AI agents reduce days-long manual processes to seconds. </p>
+    <div class="meta-row">
+      <div class="stat"><span class="n" id="domCount">—</span><span class="l">Process Domains</span></div>
+      <div class="stat"><span class="n" id="procCount">—</span><span class="l">Sub-Processes</span></div>
+      <div class="stat"><span class="n" id="stepCount">—</span><span class="l">Flow Steps</span></div>
+      <div class="stat"><span class="n">DC·DB</span><span class="l">Plan Scope</span></div>
+    </div>
+  </header>
+
+<div class="tabs-bar">
+  <button class="tab-btn active"   onclick="switchMainTab('process',this)">Process Map</button>
+  <button class="tab-btn ai-tab"   onclick="switchMainTab('ai',this)">AI Automation</button>
+  <button class="tab-btn flow-tab" onclick="switchMainTab('flow',this)">Process Flow</button>
+</div>
+
+<div id="panel-process" class="tab-panel active">
+  <div class="controls">
+    <label class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="q" type="text" placeholder="Search — RMD, QDRO, 417(e) lump sum, annuitant payroll, NAV, forfeiture…" autocomplete="off">
+    </label>
+    <div class="seg" id="scopeSeg">
+      <button data-scope="all" class="active">All</button>
+      <button data-scope="DC">DC</button>
+      <button data-scope="DB">DB</button>
+      <button data-scope="AI" style="background:none;color:var(--ai);border-left:1px solid var(--ink);">AI Agents</button>
+    </div>
+    <button class="btn" id="expandAll">Expand all</button>
+    <button class="btn" id="collapseAll">Collapse</button>
+    <span class="count-note" id="filterNote"></span>
+  </div>
+  <main class="grid" id="grid"></main>
+  <div class="no-results" id="noRes">No processes match that term.</div>
+</div>
+
+<div id="panel-ai" class="tab-panel">
+<div class="ais-wrap">
+<p class="ais-intro">Each row below pairs one process stage as it operates today (left) with how it runs with an AI agent embedded (right). Every tile maps to a domain in the process map.</p>
+
+<div class="ais-header-row">
+  <div class="ais-header-cell asis">
+    <span class="ais-badge asis-badge">AS-IS — CURRENT STATE</span>
+    <h2>How It Works Today</h2>
+    <p>Manual-intensive · multi-day turnaround · rules checked by humans</p>
+  </div>
+  <div class="ais-header-cell reim">
+    <span class="ais-badge reimagined-badge">RE-IMAGINED — WITH AI</span>
+    <h2>Process Re-imagined with AI</h2>
+    <p>Retrieval-governed agents at every manual touchpoint · seconds not days</p>
+  </div>
+</div>
+
+<div class="stage-row">
+  <div class="tile asis">
+    <div class="stage-num">Stage 01 · Eligibility &amp; Enrollment</div>
+    <div class="stage-name">Manual eligibility tracking</div>
+    <ul class="stage-steps">
+      <li>HR manually monitors service hours &amp; age thresholds</li>
+      <li>Eligibility calculated periodically — not in real time</li>
+      <li>Auto-enrollment triggered reactively after payroll events</li>
+    </ul>
+    <span class="pain-tag">Pain: Delayed enrollment · compliance risk from missed eligibility windows</span>
+  </div>
+  <div class="tile reim">
+    <div class="stage-num">Stage 01 · Eligibility &amp; Enrollment</div>
+    <div class="stage-name">AI eligibility prediction agent</div>
+    <ul class="stage-steps">
+      <li>AI reads census and hours data from Omni every cycle</li>
+      <li>Flags who becomes eligible in next 30 / 60 / 90 days</li>
+      <li>Auto-enrollment pre-staged; HR notified in advance automatically</li>
+    </ul>
+    <span class="gain-tag">Outcome: Proactive weekly report · zero missed eligibility windows</span>
+  </div>
+</div>
+
+<div class="stage-row">
+  <div class="tile asis">
+    <div class="stage-num">Stage 02 · Contributions</div>
+    <div class="stage-name">Payroll file processing &amp; match calculation</div>
+    <ul class="stage-steps">
+      <li>Employer sends payroll file — Omni "load and go" picks it up</li>
+      <li>Data type errors fail the load — ops team investigates manually</li>
+      <li>Employer match true-up calculated once a year by hand</li>
+    </ul>
+    <span class="pain-tag">Pain: File errors cause delays · true-up errors create compliance exposure</span>
+  </div>
+  <div class="tile reim">
+    <div class="stage-num">Stage 02 · Contributions</div>
+    <div class="stage-name">AI file validation &amp; true-up agent</div>
+    <ul class="stage-steps">
+      <li>AI validates payroll file the moment it lands — before load-and-go runs</li>
+      <li>Data errors diagnosed and returned with specific fix instructions in minutes</li>
+      <li>Match true-up calculated continuously — discrepancy flagged same day</li>
+    </ul>
+    <span class="gain-tag">Outcome: File errors caught before they fail · true-up always current</span>
+  </div>
+</div>
+
+<div class="stage-row">
+  <div class="tile asis">
+    <div class="stage-num">Stage 03 · Loans</div>
+    <div class="stage-name">Manual loan eligibility &amp; document review</div>
+    <ul class="stage-steps">
+      <li>Participant calls or emails to ask about eligibility — wait for response</li>
+      <li>General purpose: ops team manually runs eligibility check</li>
+      <li>Primary residence: docs uploaded → Omni workflow → Genpact L1 ops manually reviews each document</li>
+      <li>L2 FIS escalates; process restarts if docs are incomplete</li>
+    </ul>
+    <span class="pain-tag">Pain: 3–4 days turnaround · fraud risk on uploaded docs · no pre-validation</span>
+  </div>
+  <div class="tile reim">
+    <div class="stage-num">Stage 03 · Loans</div>
+    <div class="stage-name">AI loan eligibility &amp; document validation agent (UC-14)</div>
+    <ul class="stage-steps">
+      <li>Participant self-serves: AI instantly calculates max loan, EMI schedule, and loan-vs-hardship comparison</li>
+      <li>Docs validated at point of WRS upload — completeness + fraud detection before Omni</li>
+      <li>Valid requests fast-tracked to nightly cycle; deficient requests returned with exact requirements</li>
+    </ul>
+    <span class="gain-tag">Outcome: 3–4 days → real time · fraud caught at submission · L1 review eliminated</span>
+  </div>
+</div>
+
+<div class="stage-row">
+  <div class="tile asis">
+    <div class="stage-num">Stage 04 · Hardship Withdrawals</div>
+    <div class="stage-name">Manual hardship adjudication via Omni ops workflow</div>
+    <ul class="stage-steps">
+      <li>Participant initiates in WRS — selects reason, uploads documents</li>
+      <li>Omni validates basic data then generates ops workflow task</li>
+      <li>Genpact L1 manually checks: valid IRS safe-harbor reason? Right docs? Amount within limits?</li>
+      <li>Rejected requests sent back — process restarts from beginning</li>
+      <li>Approved request parked for nightly cycle; disbursed next day</li>
+    </ul>
+    <span class="pain-tag">Pain: 3–5 days end-to-end · inconsistent decisions · no audit trail on reasoning</span>
+  </div>
+  <div class="tile reim">
+    <div class="stage-num">Stage 04 · Hardship Withdrawals</div>
+    <div class="stage-name">AI hardship adjudication agent — BUILT (UC-16)</div>
+    <ul class="stage-steps">
+      <li>AI retrieves plan-specific hardship provisions via semantic search</li>
+      <li>Applies 4-check framework: IRS safe-harbor reason · vested balance · amount limit · documentation</li>
+      <li>Returns APPROVED / DENIED / ESCALATE in under 5 seconds with full citation and rationale</li>
+      <li>Immutable audit log: every decision linked to exact plan section and IRS regulation</li>
+    </ul>
+    <span class="gain-tag">Outcome: 3–5 days → 5 seconds · consistent decisions · full audit trail on every case</span>
+  </div>
+</div>
+
+<div class="stage-row">
+  <div class="tile asis">
+    <div class="stage-num">Stage 05 · Distributions &amp; RMD</div>
+    <div class="stage-name">Manual RMD identification &amp; calculation</div>
+    <ul class="stage-steps">
+      <li>59½ withdrawals processed via same Omni manual ops review flow</li>
+      <li>RMD: plan admin manually identifies participants aged 72½+ from census</li>
+      <li>IRS life-expectancy table looked up by hand per participant</li>
+      <li>Missed RMDs trigger 25% excise tax — discovered after the fact</li>
+    </ul>
+    <span class="pain-tag">Pain: Manual IRS table lookup at scale · missed RMDs a real compliance risk</span>
+  </div>
+  <div class="tile reim">
+    <div class="stage-num">Stage 05 · Distributions &amp; RMD</div>
+    <div class="stage-name">AI RMD identification &amp; calculation agent (UC-17)</div>
+    <ul class="stage-steps">
+      <li>AI scans all participant records every cycle — identifies anyone at or past RMD age</li>
+      <li>Calculates RMD per participant using IRS Uniform Lifetime Table automatically</li>
+      <li>Checks prior-year distributions — flags shortfall risk before deadline</li>
+      <li>Generates audit-ready compliance report; alerts administrators proactively</li>
+    </ul>
+    <span class="gain-tag">Outcome: Zero missed RMDs · 25% excise tax risk eliminated · automated at any plan scale</span>
+  </div>
+</div>
+
+<div class="stage-row">
+  <div class="tile asis">
+    <div class="stage-num">Stage 06 · Compliance Testing</div>
+    <div class="stage-name">Manual ADP/ACP, HCE, and 402(g) testing</div>
+    <ul class="stage-steps">
+      <li>Compensation and deferral data pulled from Omni nightly reports manually</li>
+      <li>HCE classification from prior-year compensation — error-prone at scale</li>
+      <li>ADP/ACP ratios calculated in spreadsheets</li>
+      <li>Test failures discovered late — corrective distributions often rushed</li>
+    </ul>
+    <span class="pain-tag">Pain: Highest manual effort · late discovery of failures compounds penalties</span>
+  </div>
+  <div class="tile reim">
+    <div class="stage-num">Stage 06 · Compliance Testing</div>
+    <div class="stage-name">AI compliance testing agent</div>
+    <ul class="stage-steps">
+      <li>AI reads Omni nightly reports — runs ADP/ACP, HCE, and 402(g) monitoring every cycle</li>
+      <li>Test failures flagged in real time — corrective action begins immediately</li>
+      <li>HCE classification verified automatically from compensation data, no spreadsheets</li>
+      <li>Compliance calendar managed by AI — deadlines tracked, escalations triggered automatically</li>
+    </ul>
+    <span class="gain-tag">Outcome: Continuous compliance vs annual crunch · failures caught early · penalties avoided</span>
+  </div>
+</div>
+
+<div class="stage-row">
+  <div class="tile asis">
+    <div class="stage-num">Stage 07 · Beneficiary &amp; QDRO</div>
+    <div class="stage-name">Manual beneficiary management &amp; death claims</div>
+    <ul class="stage-steps">
+      <li>Beneficiary designations updated manually on request only</li>
+      <li>No proactive communication to participants about current designations</li>
+      <li>On death: multiple claimants often dispute — legal review, potential litigation</li>
+      <li>QDRO interpretation done by legal team — slow and expensive</li>
+    </ul>
+    <span class="pain-tag">Pain: Disputes discovered only on death · QDRO interpretation delays weeks</span>
+  </div>
+  <div class="tile reim">
+    <div class="stage-num">Stage 07 · Beneficiary &amp; QDRO</div>
+    <div class="stage-name">AI beneficiary transparency &amp; QDRO agent</div>
+    <ul class="stage-steps">
+      <li>Monthly AI report to each participant: current balance + named beneficiaries + % each receives</li>
+      <li>Participant acknowledgement captured — documented trail reduces death-claim disputes</li>
+      <li>QDRO: AI reads order language, checks qualification criteria, flags ambiguities before legal review</li>
+    </ul>
+    <span class="gain-tag">Outcome: Disputes reduced before they arise · QDRO pre-screened in hours not weeks</span>
+  </div>
+</div>
+
+<div class="stage-row">
+  <div class="tile asis">
+    <div class="stage-num">Stage 08 · Tax Reporting</div>
+    <div class="stage-name">Manual 1099-R, 5500, and SAR assembly</div>
+    <ul class="stage-steps">
+      <li>Distribution events aggregated manually at year-end</li>
+      <li>1099-R codes applied by hand per distribution type</li>
+      <li>Underpayment risk not calculated until filing — surprises for participants</li>
+      <li>5500 data compiled from multiple Omni reports — labour-intensive</li>
+    </ul>
+    <span class="pain-tag">Pain: Year-end crunch · underpayment risk invisible until too late</span>
+  </div>
+  <div class="tile reim">
+    <div class="stage-num">Stage 08 · Tax Reporting</div>
+    <div class="stage-name">AI tax reporting intelligence agent</div>
+    <ul class="stage-steps">
+      <li>AI aggregates all distribution events from Omni reports throughout the year</li>
+      <li>Correct 1099-R code applied automatically per event type</li>
+      <li>Underpayment risk calculated in real time — participants alerted before Q4</li>
+      <li>5500 signal data pre-compiled — audit support ready on demand</li>
+    </ul>
+    <span class="gain-tag">Outcome: Year-round accuracy · underpayment risk visible early · audit package ready</span>
+  </div>
+</div>
+
+<div class="stage-row">
+  <div class="tile asis">
+    <div class="stage-num">Stage 09 · Nightly Cycle Exceptions</div>
+    <div class="stage-name">Next-day manual exception review</div>
+    <ul class="stage-steps">
+      <li>Nightly cycle runs and generates exception report</li>
+      <li>Ops team reviews the report next business morning</li>
+      <li>Each exception researched and resolved manually</li>
+      <li>Recurring errors not identified as patterns</li>
+    </ul>
+    <span class="pain-tag">Pain: Next-day turnaround · recurring errors missed · no pattern detection</span>
+  </div>
+  <div class="tile reim">
+    <div class="stage-num">Stage 09 · Nightly Cycle Exceptions</div>
+    <div class="stage-name">AI nightly exception triage agent</div>
+    <ul class="stage-steps">
+      <li>Immediately after nightly cycle, AI reads exception report and triages every item</li>
+      <li>Common failures auto-resolved or routed to correct team with diagnosis</li>
+      <li>Recurring errors identified as patterns — root-cause fix recommended</li>
+      <li>Summary delivered before ops team starts next morning</li>
+    </ul>
+    <span class="gain-tag">Outcome: Same-night resolution · patterns surfaced · no next-day surprise backlog</span>
+  </div>
+</div>
+
+</div>
+</div>
+
+<div id="panel-flow" class="tab-panel">
+<div class="pf-wrap">
+
+  <p class="pf-section-title">Current State — How Retirement Operations Work Today</p>
+  <p class="pf-section-sub">Scroll horizontally to see all 9 process stages across each actor layer. Orange cells highlight manual effort; white cells are automated or not applicable.</p>
+  <div class="swimlane-wrap">
+  <div class="swimlane">
+    <div class="swimlane-header"><div class="sl-corner">Actor / Layer</div><div class="sl-stage-head"><span class="sn">Stage 01</span><span class="sl">Eligibility</span></div><div class="sl-stage-head"><span class="sn">Stage 02</span><span class="sl">Contributions</span></div><div class="sl-stage-head"><span class="sn">Stage 03</span><span class="sl">Loans</span></div><div class="sl-stage-head"><span class="sn">Stage 04</span><span class="sl">Hardship</span></div><div class="sl-stage-head"><span class="sn">Stage 05</span><span class="sl">RMD</span></div><div class="sl-stage-head"><span class="sn">Stage 06</span><span class="sl">Compliance</span></div><div class="sl-stage-head"><span class="sn">Stage 07</span><span class="sl">Beneficiary</span></div><div class="sl-stage-head"><span class="sn">Stage 08</span><span class="sl">Tax Report</span></div><div class="sl-stage-head"><span class="sn">Stage 09</span><span class="sl">Exceptions</span></div></div>
+    <div class="sl-row"><div class="sl-lane-label">Participant / Employee</div><div class="sl-cell active"><ul><li>Checks eligibility manually or waits for HR</li></ul></div><div class="sl-cell active"><ul><li>Defers salary % via payroll</li></ul></div><div class="sl-cell active"><ul><li>Calls ops to ask about loan</li><li>Uploads docs to WRS</li></ul></div><div class="sl-cell active"><ul><li>Submits request in WRS</li><li>Uploads hardship docs</li></ul></div><div class="sl-cell "></div><div class="sl-cell "></div><div class="sl-cell active"><ul><li>Designates beneficiaries manually</li></ul></div><div class="sl-cell "></div><div class="sl-cell "></div></div><div class="sl-row"><div class="sl-lane-label">Employer / Payroll</div><div class="sl-cell active"><ul><li>Sends census / hours data periodically</li></ul></div><div class="sl-cell active"><ul><li>Sends payroll contribution file</li><li>Computes match once/yr</li></ul></div><div class="sl-cell "></div><div class="sl-cell "></div><div class="sl-cell "></div><div class="sl-cell active"><ul><li>Provides comp data for HCE test</li></ul></div><div class="sl-cell "></div><div class="sl-cell active"><ul><li>Files Form 5500 with manual data</li></ul></div><div class="sl-cell "></div></div><div class="sl-row"><div class="sl-lane-label">WRS (Portal)</div><div class="sl-cell "></div><div class="sl-cell "></div><div class="sl-cell active"><ul><li>Receives doc upload</li><li>No pre-validation</li></ul><span class='pain-node'>Fraud risk</span></div><div class="sl-cell active"><ul><li>Receives request &amp; doc upload</li><li>No pre-validation</li></ul></div><div class="sl-cell "></div><div class="sl-cell "></div><div class="sl-cell "></div><div class="sl-cell "></div><div class="sl-cell "></div></div><div class="sl-row"><div class="sl-lane-label">Omni (Recordkeeper)</div><div class="sl-cell active"><ul><li>Stores census; no auto-flag</li></ul></div><div class="sl-cell active"><ul><li>Load-and-go picks up file</li><li>Data type checks only</li></ul><span class='pain-node'>Errors fail load</span></div><div class="sl-cell active"><ul><li>Generates ops workflow</li></ul></div><div class="sl-cell active"><ul><li>Basic data validation</li><li>Generates ops workflow</li></ul></div><div class="sl-cell active"><ul><li>No auto-ID; manual census check</li></ul></div><div class="sl-cell active"><ul><li>Nightly data available; no auto-test</li></ul></div><div class="sl-cell active"><ul><li>Stores designations</li></ul></div><div class="sl-cell active"><ul><li>Stores distribution events</li></ul></div><div class="sl-cell active"><ul><li>Generates exception report</li></ul></div></div><div class="sl-row"><div class="sl-lane-label">Operations (Genpact L1)</div><div class="sl-cell "></div><div class="sl-cell pain-active"><ul><li>Manually investigates file errors</li></ul><span class='pain-node'>Days to fix</span></div><div class="sl-cell pain-active"><ul><li>Manually opens &amp; validates each document</li></ul><span class='pain-node'>3–4 days</span></div><div class="sl-cell pain-active"><ul><li>Manually checks reason, docs, amount</li><li>Sends back if wrong</li></ul><span class='pain-node'>3–5 days</span></div><div class="sl-cell pain-active"><ul><li>Manually looks up IRS table per participant</li></ul><span class='pain-node'>Scale problem</span></div><div class="sl-cell pain-active"><ul><li>Pulls data manually</li><li>Runs tests in spreadsheets</li></ul><span class='pain-node'>Annual crunch</span></div><div class="sl-cell pain-active"><ul><li>Processes death claims manually</li><li>Resolves disputes</li></ul><span class='pain-node'>Litigation risk</span></div><div class="sl-cell pain-active"><ul><li>Manually assembles 1099-R &amp; 5500</li></ul><span class='pain-node'>Year-end rush</span></div><div class="sl-cell pain-active"><ul><li>Reviews exceptions next morning</li></ul><span class='pain-node'>Next-day only</span></div></div><div class="sl-row"><div class="sl-lane-label">Nightly Cycle</div><div class="sl-cell "></div><div class="sl-cell active"><ul><li>Posts valid contributions</li></ul></div><div class="sl-cell active"><ul><li>Posts after ops sign-off</li></ul></div><div class="sl-cell active"><ul><li>Posts after ops approval</li></ul></div><div class="sl-cell active"><ul><li>Posts distributions</li></ul></div><div class="sl-cell "></div><div class="sl-cell active"><ul><li>Posts beneficiary transfers</li></ul></div><div class="sl-cell "></div><div class="sl-cell active"><ul><li>Runs; generates exception report</li></ul></div></div><div class="sl-row"><div class="sl-lane-label">Trust / ACH</div><div class="sl-cell "></div><div class="sl-cell active"><ul><li>Funds participant account</li></ul></div><div class="sl-cell active"><ul><li>Disburses loan</li></ul></div><div class="sl-cell active"><ul><li>Disburses hardship amount</li></ul></div><div class="sl-cell active"><ul><li>Disburses RMD</li></ul></div><div class="sl-cell "></div><div class="sl-cell active"><ul><li>Disburses to beneficiaries</li></ul></div><div class="sl-cell "></div><div class="sl-cell "></div></div>
+  </div>
+</div>
+
+  <hr class="pf-divider">
+
+  <p class="pf-section-title">Future State — Process Re-imagined with AI</p>
+  <p class="pf-section-sub">The same 9 stages and actor layers — teal cells show where AI agents replace or augment each manual step. Operations team effort is dramatically reduced.</p>
+  <div class="swimlane-wrap">
+  <div class="swimlane">
+    <div class="swimlane-header"><div class="sl-corner">Actor / Layer</div><div class="sl-stage-head"><span class="sn">Stage 01</span><span class="sl">Eligibility</span></div><div class="sl-stage-head"><span class="sn">Stage 02</span><span class="sl">Contributions</span></div><div class="sl-stage-head"><span class="sn">Stage 03</span><span class="sl">Loans</span></div><div class="sl-stage-head"><span class="sn">Stage 04</span><span class="sl">Hardship</span></div><div class="sl-stage-head"><span class="sn">Stage 05</span><span class="sl">RMD</span></div><div class="sl-stage-head"><span class="sn">Stage 06</span><span class="sl">Compliance</span></div><div class="sl-stage-head"><span class="sn">Stage 07</span><span class="sl">Beneficiary</span></div><div class="sl-stage-head"><span class="sn">Stage 08</span><span class="sl">Tax Report</span></div><div class="sl-stage-head"><span class="sn">Stage 09</span><span class="sl">Exceptions</span></div></div>
+    <div class="sl-row"><div class="sl-lane-label">Participant / Employee</div><div class="sl-cell ai-active"><ul><li>Self-serves — checks eligibility status in real time</li></ul></div><div class="sl-cell ai-active"><ul><li>Defers salary % via payroll</li></ul></div><div class="sl-cell ai-active"><ul><li>Self-serves loan eligibility &amp; EMI instantly</li><li>Uploads docs — validated immediately</li></ul></div><div class="sl-cell ai-active"><ul><li>Submits request in WRS</li><li>Uploads docs — fraud-checked at upload</li></ul></div><div class="sl-cell ai-active"><ul><li>Receives proactive RMD alert</li></ul></div><div class="sl-cell "></div><div class="sl-cell ai-active"><ul><li>Receives monthly beneficiary report</li><li>Acknowledges or updates</li></ul></div><div class="sl-cell ai-active"><ul><li>Receives real-time underpayment alerts</li></ul></div><div class="sl-cell "></div></div><div class="sl-row"><div class="sl-lane-label">Employer / Payroll</div><div class="sl-cell ai-active"><ul><li>Sends census data; AI flags errors immediately</li></ul></div><div class="sl-cell ai-active"><ul><li>Sends payroll file; AI validates before load</li></ul><span class='gain-node'>Errors caught pre-load</span></div><div class="sl-cell "></div><div class="sl-cell "></div><div class="sl-cell "></div><div class="sl-cell ai-active"><ul><li>Provides comp data; AI classifies HCE automatically</li></ul></div><div class="sl-cell "></div><div class="sl-cell ai-active"><ul><li>5500 data pre-compiled by AI</li></ul></div><div class="sl-cell "></div></div><div class="sl-row"><div class="sl-lane-label">AI Agent Layer (WRS)</div><div class="sl-cell ai-active"><ul><li>Eligibility prediction agent flags next 30/60/90 days</li></ul><span class='gain-node'>Proactive report</span></div><div class="sl-cell ai-active"><ul><li>File validator catches errors before load-and-go</li></ul></div><div class="sl-cell ai-active"><ul><li>Doc validator checks completeness + fraud at upload</li></ul><span class='gain-node'>UC-14</span></div><div class="sl-cell ai-active"><ul><li>Hardship agent adjudicates in &lt;5 seconds</li></ul><span class='gain-node'>UC-16 — BUILT</span></div><div class="sl-cell ai-active"><ul><li>RMD agent calculates per IRS table automatically</li></ul><span class='gain-node'>UC-17</span></div><div class="sl-cell ai-active"><ul><li>Compliance agent runs ADP/ACP every cycle</li></ul><span class='gain-node'>Continuous</span></div><div class="sl-cell ai-active"><ul><li>Beneficiary transparency report monthly</li></ul></div><div class="sl-cell ai-active"><ul><li>Tax agent applies 1099-R codes continuously</li></ul></div><div class="sl-cell ai-active"><ul><li>Exception triage agent — runs same night</li></ul><span class='gain-node'>No next-day delay</span></div></div><div class="sl-row"><div class="sl-lane-label">Omni (Recordkeeper)</div><div class="sl-cell ai-active"><ul><li>AI reads census every cycle; auto-flags eligibility</li></ul></div><div class="sl-cell ai-active"><ul><li>Load-and-go runs on clean files only</li></ul></div><div class="sl-cell ai-active"><ul><li>Validated requests fast-tracked</li></ul></div><div class="sl-cell ai-active"><ul><li>Only escalated cases reach ops workflow</li></ul></div><div class="sl-cell ai-active"><ul><li>AI reads participant records; RMD calculated</li></ul></div><div class="sl-cell ai-active"><ul><li>AI reads nightly data; tests run automatically</li></ul></div><div class="sl-cell ai-active"><ul><li>Beneficiary data read; report generated</li></ul></div><div class="sl-cell ai-active"><ul><li>Distribution events read continuously</li></ul></div><div class="sl-cell ai-active"><ul><li>Exception report read by AI immediately</li></ul></div></div><div class="sl-row"><div class="sl-lane-label">Operations (Genpact L1)</div><div class="sl-cell "><ul><li style='color:var(--ink-soft)'><em>No action — fully automated</em></li></ul></div><div class="sl-cell "><ul><li style='color:var(--ink-soft)'><em>No action — errors pre-resolved</em></li></ul></div><div class="sl-cell "><ul><li style='color:var(--ink-soft)'><em>No action — AI validates docs</em></li></ul></div><div class="sl-cell ai-active"><ul><li>Reviews only ESCALATE decisions</li></ul><span class='gain-node'>Edge cases only</span></div><div class="sl-cell "><ul><li style='color:var(--ink-soft)'><em>No action — automated</em></li></ul></div><div class="sl-cell "><ul><li style='color:var(--ink-soft)'><em>No action — continuous AI testing</em></li></ul></div><div class="sl-cell ai-active"><ul><li>Handles complex death claims only</li></ul></div><div class="sl-cell "><ul><li style='color:var(--ink-soft)'><em>No action — AI assembles data</em></li></ul></div><div class="sl-cell ai-active"><ul><li>Reviews only unresolved exceptions</li></ul></div></div><div class="sl-row"><div class="sl-lane-label">Nightly Cycle</div><div class="sl-cell "></div><div class="sl-cell ai-active"><ul><li>Posts clean contributions</li></ul></div><div class="sl-cell ai-active"><ul><li>Posts valid loans immediately</li></ul></div><div class="sl-cell ai-active"><ul><li>Posts approved hardship same cycle</li></ul></div><div class="sl-cell ai-active"><ul><li>Posts RMD distributions</li></ul></div><div class="sl-cell "></div><div class="sl-cell ai-active"><ul><li>Posts beneficiary transfers</li></ul></div><div class="sl-cell "></div><div class="sl-cell ai-active"><ul><li>AI triages exception report same night</li></ul></div></div><div class="sl-row"><div class="sl-lane-label">Trust / ACH</div><div class="sl-cell "></div><div class="sl-cell ai-active"><ul><li>Funds participant account</li></ul></div><div class="sl-cell ai-active"><ul><li>Disburses loan — next day</li></ul></div><div class="sl-cell ai-active"><ul><li>Disburses hardship — next day vs 3–5 days before</li></ul></div><div class="sl-cell ai-active"><ul><li>Disburses RMD on time</li></ul></div><div class="sl-cell "></div><div class="sl-cell ai-active"><ul><li>Disburses to beneficiaries</li></ul></div><div class="sl-cell "></div><div class="sl-cell "></div></div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<footer>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--teal)"></i> Defined Contribution domains (01–16)</span>
+    <span><i class="dot" style="background:var(--plum)"></i> Defined Benefit domains (17–21)</span>
+    <span><i class="dot" style="background:var(--ai)"></i> AI Agent Opportunities (22) · FIS TRP System Architecture (23)</span>
+    <span><i class="dot" style="background:var(--brass)"></i> Flow step · <i class="dot" style="background:var(--ink)"></i> terminal step</span>
+  </div>
+  <p class="fnote"><b>How to read it.</b> Three levels: domain → sub-process → process flow. Click a domain to reveal its sub-processes; click any sub-process to reveal its ordered flow. Flows are the typical happy-path sequence with key control/decision points called out. <b>System architecture layer (Domain 23)</b> documents the actual FIS TRP stack: WRS (participant portal) → Omni (recordkeeping engine) → Omni (workflow/ops) → Nightly Cycle (batch job) → Trust/Disbursement. <b>AI Agents (Domain 22)</b> identify where retrieval-governed agents reduce days-long manual processes to seconds. Highest-priority automation targets: Domains 6 (Loans), 7 (Distributions/Hardship), 9 (Compliance testing).</p>
+</footer>
+
+</div>
+
+<script>
+
+/* scope: "DC" or "DB"; each proc = [code-suffix implied by order, title, [steps...]] */
+const DOMAINS = [
+{n:"01",scope:"DC",name:"Plan Implementation & Onboarding",tag:"Value chain · Onboard",desc:"Standing up a new or converting plan on the platform.",procs:[
+ ["Plan installation & build",["Receive executed contract & service agreement","Create plan record, ID & hierarchy on platform","Configure service model (channels, statements, fee schedule)","Link trust / custody accounts","Assign implementation manager & build project plan","Schedule go-live & blackout window"]],
+ ["Plan-document interpretation & coding",["Obtain adoption agreement, plan document & amendments","Abstract provisions: eligibility, vesting, match, money types, distributions","Code rules into recordkeeping system","Peer-review configuration against document","ERISA / compliance sign-off"]],
+ ["Conversion / takeover management",["Issue data-request & de-conversion checklist to prior recordkeeper","Agree cutover timeline & blackout dates","Receive & stage conversion files","Coordinate asset liquidation / transfer","Run mock conversion & balance","Execute go-live cutover"]],
+ ["Data conversion & validation",["Map source fields to target layout","Load indicative, balance, contribution-history, loan & vesting data","Run edit checks & produce exception report","Reconcile loaded balances to prior-provider statement","Resolve exceptions & re-load","Obtain conversion balancing sign-off"]],
+ ["Asset transfer & liquidation/in-kind reconciliation",["Confirm transfer method (cash vs in-kind) per fund","Instruct prior trustee to liquidate / transfer","Receive assets into omnibus / trust","Match units, shares & cash to blackout statement","Investigate variances (market, fees, timing)","Clear and confirm plan fully funded"]],
+ ["Blackout setup & notice coordination",["Determine blackout scope & dates","Generate SOX 306 / blackout notice ≥30 days prior","Distribute & log delivery","Freeze affected transactions at blackout start","Lift blackout post-reconciliation & notify"]],
+ ["Payroll integration setup",["Provide file specification & money-type map","Build payroll bridge / SFTP connection","Receive & validate test file","Reconcile test contributions","Certify production-ready"]],
+ ["Investment lineup & fund mapping setup",["Load fund menu, tickers, share classes & CUSIPs","Configure QDIA & model portfolios","Set trading & settlement parameters per fund","Map legacy funds to new lineup","Validate pricing-feed connectivity"]],
+ ["Plan validation & parallel testing",["Run sample contributions, trades & statements","Verify match, vesting & eligibility calculations","Compare parallel output to expected results","Log & resolve defects","Obtain client & internal go-live sign-off"]]
+]},
+{n:"02",scope:"DC",name:"Eligibility & Enrollment",tag:"Value chain · Enroll",desc:"Getting eligible employees onto the plan correctly.",procs:[
+ ["Eligibility determination & tracking",["Receive census / hours data","Apply age & service rules","Compute entry date","Flag newly eligible","Notify / enroll & update status"]],
+ ["Enrollment processing",["Receive election (web / voice / paper)","Validate completeness (NIGO check)","Record deferral %, money type & investment elections","Send to payroll for deduction","Confirm to participant"]],
+ ["Auto-enrollment (ACA / EACA / QACA)",["Identify auto-enroll-eligible non-electors","Apply default deferral rate & QDIA","Send default deferral to payroll","Track permissible-withdrawal window","Process opt-outs / permissible withdrawals"]],
+ ["Auto-escalation / auto-increase",["Identify participants below cap on increase date","Apply scheduled rate increase","Transmit new rate to payroll","Notify participant","Honor opt-outs"]],
+ ["Re-enrollment sweeps",["Identify in-scope participants","Issue re-enrollment notice & election window","Default non-responders to QDIA","Generate mapping trades","Confirm new allocations"]],
+ ["Beneficiary designation & maintenance",["Receive designation (form / online)","Validate spousal consent if required","Record primary / contingent split","Store & index document","Confirm to participant"]],
+ ["QDIA default processing",["Identify unallocated / defaulted contributions","Direct to QDIA fund","Satisfy QDIA notice requirement","Allow participant redirect within window"]]
+]},
+{n:"03",scope:"DC",name:"Participant Data Management",tag:"Cross-cutting",desc:"Maintaining the system of record for each participant.",procs:[
+ ["Indicative / demographic maintenance",["Receive update (file / CSR / web)","Validate & apply change","Trigger downstream (statements, tax, payroll)","Audit-log the change"]],
+ ["Address change & validation",["Receive address change","Run validation / standardization","Apply recent-change disbursement hold","Update record & confirm"]],
+ ["Employment status changes",["Receive status event from payroll","Update status & effective dates","Trigger rule changes (vesting, distribution eligibility, loan)","Notify participant of options"]],
+ ["Cross-file data-integrity validation",["Compare payroll vs census vs recordkeeping data","Flag mismatches (SSN, comp, status)","Route exceptions to sponsor","Resolve & re-sync"]],
+ ["Participant identity & SSN management",["Detect duplicate / invalid IDs","Verify correct identity","Merge / correct records","Re-link history & balances"]]
+]},
+{n:"04",scope:"DC",name:"Contribution Processing",tag:"Value chain · Money In",desc:"Receiving, validating and investing plan money.",procs:[
+ ["Payroll file receipt, parsing & validation",["Receive file via secure channel","Parse to expected layout","Run edit checks (totals, formats, new IDs)","Generate exception report","Hold or release for posting"]],
+ ["Remittance & cash matching",["Receive funding (wire / ACH)","Match cash to file totals","Resolve variances","Release matched batch"]],
+ ["Money-type allocation",["Split amounts by source per record","Validate against plan-allowed sources & limits","Post to participant source buckets (pre-tax, Roth, after-tax, match, PS, QNEC/QMAC)"]],
+ ["Investment of contributions / trade generation",["Allocate posted contributions to elections / QDIA","Aggregate to omnibus buy orders","Submit to trading","Confirm shares / units posted"]],
+ ["Employer match & true-up calculation",["Compute per-period match per formula","Fund & post match","Run annual true-up vs full-year compensation","Post / collect true-up amount"]],
+ ["Deferral-rate change processing",["Receive rate change","Validate effective date","Transmit to payroll","Update record & confirm"]],
+ ["Contribution corrections & reallocations",["Identify misposting / late deposit","Calculate correction & lost earnings","Reverse & re-post","Document for audit"]],
+ ["Suspense / clearing account management",["Park unmatched / unallocated money","Age & research","Allocate or refund on resolution","Report aged items"]],
+ ["Forfeiture processing & application",["Identify unvested amount on termination","Move to forfeiture account","Apply per plan (offset match / pay fees / reallocate)","Document application"]]
+]},
+{n:"05",scope:"DC",name:"Investment Operations & Trading",tag:"Value chain · Invest",desc:"Daily valuation, trading, settlement and reconciliation.",procs:[
+ ["NAV / price capture & validation",["Receive daily price feed","Tolerance-check vs prior day","Apply stale / missing-price logic","Release prices for valuation"]],
+ ["Trade order management & aggregation",["Capture all participant activity","Net to fund-level orders","Validate against available cash","Stage for placement"]],
+ ["Trade placement & transmission",["Transmit orders (NSCC Fund/SERV, custodian, fund company)","Confirm acceptance","Record order IDs"]],
+ ["Trade settlement & confirmation",["Receive confirms","Match to orders","Settle cash","Resolve as-of / late trades"]],
+ ["Cash & share/unit reconciliation",["Compare recordkeeping positions to custodian","Identify breaks","Research & correct","Confirm balanced"]],
+ ["Dividend & capital-gains processing",["Receive distribution declaration","Calculate per-account allocation","Reinvest / post","Reconcile"]],
+ ["Corporate actions",["Receive corporate-action notice","Determine participant impact","Process (merger / liquidation / split)","Reconcile new positions"]],
+ ["Fund change / mapping / blackout trades",["Receive menu-change instruction","Schedule blackout","Generate mapping sell / buy trades","Reconcile & lift blackout"]],
+ ["Self-directed brokerage (SDBA) administration",["Open brokerage window per participant","Move money to / from core","Reconcile brokerage balances daily","Reflect on statement"]],
+ ["Managed-account & advice interface",["Send participant data to advice provider","Receive model allocations","Generate trades","Reconcile & report"]],
+ ["Stable value / general account / GIC processing",["Apply crediting rate","Maintain book value","Enforce equity-wash / put provisions","Process contract maturities"]],
+ ["CIT, separate-account & unit accounting",["Receive underlying valuations","Calculate daily unit value","Apply to participant units","Reconcile to fund accounting"]],
+ ["Rebalancing",["Identify due accounts (participant / model)","Calculate trades to target","Execute","Confirm allocations"]]
+]},
+{n:"06",scope:"DC",name:"Loan Administration",tag:"Value chain · Service",desc:"The full participant-loan lifecycle.",procs:[
+ ["General purpose loan — origination",["Validate eligibility & limits: lesser of 50% vested balance or $50,000 IRS cap","Check plan loan limit (some plans allow 1 loan, some allow 2)","Model amount, interest rate & repayment term","No documentation required for general purpose","Generate loan note & disburse","Reduce account by loan amount | AI opportunity: real-time eligibility calculator — today 3-4 days → AI real-time"]],["Primary residence loan — document validation",["Confirm loan type: primary residence (home construction/purchase only)","Receive required documents from participant via WRS portal","Route to Omni workflow for operations (Genpact L1) document review","Validate: purchase contract / title documents / lender confirmation","Check for document fraud — participants may submit fraudulent documents","L2 FIS team handles escalations","Release funds only after document validation clears | AI opportunity: document validation agent replaces Omni manual review"]],
+ ["Promissory note & document generation",["Produce note & disclosures","Capture consent / signature","Store document"]],
+ ["Amortization setup",["Build repayment schedule","Set interest basis & frequency","Transmit deduction to payroll"]],
+ ["Repayment tracking",["Post payroll / ACH repayments","Apply principal / interest split","Reinvest repayments to account","Track outstanding balance"]],
+ ["Delinquency & cure monitoring",["Detect missed payment","Start cure-period clock","Notify participant","Escalate near cure-period end"]],
+ ["Deemed distribution & default / offset",["Confirm cure-period lapse / distributable event","Calculate taxable amount","Process deemed distribution / loan offset","Generate 1099-R"]],
+ ["Refinancing & multiple-loan rules",["Validate against plan loan limits","Recompute combined amortization","Replace / add loan"]],
+ ["Leave-of-absence / military suspension",["Receive leave notice","Suspend payments (≤1 yr / USERRA)","Re-amortize on return"]]
+]},
+{n:"07",scope:"DC",name:"Distributions & Withdrawals",tag:"Value chain · Money Out",desc:"Paying money out of the plan, in good order.",procs:[
+ ["Termination / retirement distributions",["Receive request","Apply vesting & verify distributable event","NIGO / good-order review","Calculate net + withholding","Disburse & report"]],
+ ["In-service & age 59½ withdrawals",["Verify plan permits & eligibility","Validate request","Process partial distribution","Disburse & report"]],
+ ["Hardship withdrawals — Omni document review flow",["Participant initiates hardship request in WRS (Workplace Retirement Site)","Select hardship reason: 1 of 6 IRS safe harbor categories (SECURE 2.0 adds 7th — FEMA)","Upload required documents into WRS","Omni receives request, runs first-level validations (data type, eligibility)","Omni generates workflow task for Genpact L1 operations team","L1 ops manually reviews uploaded documents for completeness and validity","L2 FIS team handles escalations and complex cases","Validated transaction parked in Omni for nightly cycle (cut-off ~3-4 PM EST)","Nightly cycle runs full validation suite and posts transaction","Distribution processed with withholding; 1099-R generated | AI opportunity: UC-16 Hardship Adjudication Agent (BUILT) replaces L1 Omni manual review — days → seconds"]],
+ ["Required Minimum Distributions (RMD)",["Identify RMD-age participants","Calculate RMD (balance / life-expectancy factor)","Process by deadline","Track shortfalls & report"]],
+ ["Rollovers in & out",["Validate eligible rollover","Deliver 402(f) notice (out)","Process direct / indirect transfer","Report (1099-R out / 5498 in)"]],
+ ["Roth & after-tax distribution ordering",["Determine basis vs earnings","Apply qualified-distribution test","Order sources per rules","Report taxable portion"]],
+ ["Installments, periodic & annuity payouts",["Set up payment schedule / annuity option","Calculate periodic amount","Run recurring disbursement","Adjust / recalculate as needed"]],
+ ["Tax withholding & elections",["Capture W-4P / W-4R election","Apply federal / state default or elected rate","Withhold & remit","Reflect on 1099-R"]],
+ ["Disbursement & payment execution",["Validate payee & banking detail","Select method (check / ACH / wire)","Execute payment","Confirm & record"]],
+ ["NIGO / good-order review",["Review request for completeness","Identify deficiencies","Return to participant with reasons","Re-review on resubmission"]],
+ ["Uncashed & stale-dated check management",["Identify uncashed checks","Outreach to payee","Void & reissue or escalate","Route to escheatment if unresolved"]]
+]},
+{n:"08",scope:"DC",name:"Plan & Life Events",tag:"Value chain · Service",desc:"Non-routine participant and plan-level events.",procs:[
+ ["QDRO processing",["Receive draft / certified order","Review for qualification","Set up alternate-payee account","Split & segregate award","Notify parties"]],
+ ["Death claims & beneficiary distributions",["Receive death notice & certificate","Identify / validate beneficiaries","Determine distribution options","Process payout & report"]],
+ ["Disability processing",["Verify disability per plan","Apply distribution / loan provisions","Process accordingly"]],
+ ["Force-out / automatic rollover",["Identify small terminated balances","Apply force-out tiers (cash-out / auto-IRA)","Establish auto-IRA or cash out","Report"]],
+ ["Plan merger / spin-off / acquisition",["Receive corporate event & mapping rules","Stage population data","Migrate balances & history","Reconcile & confirm"]],
+ ["Plan termination & full distribution",["Receive termination resolution","Notify participants & collect elections","Distribute / roll over all balances","Final reconciliation & filings"]],
+ ["Partial plan termination tracking",["Monitor turnover ratio","Detect threshold breach (~20%)","Apply full vesting to affected group","Document determination"]]
+]},
+{n:"09",scope:"DC",name:"Compliance & Nondiscrimination Testing",tag:"Value chain · Comply",desc:"Keeping the plan qualified under IRS/ERISA limits.",procs:[
+ ["ADP / ACP testing",["Gather compensation & deferral data from Omni nightly reports","Classify HCE / NHCE based on prior-year compensation","Compute ADP / ACP ratios — manually intensive step","Determine pass / fail & required corrections","AI opportunity: highest manual effort alongside loans/distributions — rated #3 priority for automation"]],
+ ["Top-heavy testing",["Identify key employees","Compute key vs total account balances","Determine top-heavy status","Flag minimum-contribution requirement"]],
+ ["Coverage (410(b)) testing",["Identify benefiting vs excludable employees","Run ratio-percentage / average-benefit test","Determine pass / fail"]],
+ ["402(g) deferral-limit monitoring",["Aggregate deferrals across payrolls / plans","Compare to annual limit","Flag & return excess"]],
+ ["415 annual-additions limit",["Sum all annual additions per participant","Compare to 415(c) limit","Correct excess"]],
+ ["414(s) compensation testing",["Define compensation used","Test for non-discrimination","Adjust definition if it fails"]],
+ ["HCE / key-employee determination",["Pull compensation & ownership data","Apply HCE / key thresholds","Produce classification list"]],
+ ["Corrective distributions & refunds",["Calculate excess + earnings","Process refund / recharacterization","Meet correction deadline","Report on 1099-R"]],
+ ["EPCRS correction support",["Identify operational failure","Determine SCP vs VCP path","Calculate correction","Document / submit"]],
+ ["Compliance calendar management",["Maintain deadline calendar","Trigger task reminders","Track completion","Escalate misses"]]
+]},
+{n:"10",scope:"DC",name:"Tax Reporting & Withholding Remittance",tag:"Value chain · Comply",desc:"Government tax reporting on plan activity.",procs:[
+ ["1099-R production & filing",["Aggregate the year's distributions","Apply distribution codes","Produce & mail forms","File with IRS (FIRE / IRIS)"]],
+ ["5498 production & filing",["Aggregate rollover / contribution receipts","Produce & mail forms","File with IRS"]],
+ ["945 withholding deposit & reconciliation",["Track federal income-tax withheld","Make EFTPS deposits per schedule","Reconcile & file Form 945"]],
+ ["1042-S processing",["Identify non-resident-alien payees","Apply treaty / withholding","Produce & file 1042-S"]],
+ ["State tax reporting",["Track state withholding","Deposit per state rules","File state returns"]],
+ ["Form 5500 / SAR signal data",["Compile plan financial & participant data","Produce schedules & audit signals","Deliver to filer / auditor"]],
+ ["Tax-form corrections & reissues",["Identify error","Produce corrected form","Refile & reissue"]]
+]},
+{n:"11",scope:"DC",name:"Regulatory Notices & Disclosures",tag:"Value chain · Comply",desc:"Required participant and sponsor communications.",procs:[
+ ["Annual participant notices",["Determine required notices","Generate content (safe harbor, QDIA, auto-enroll, 404a-5)","Distribute (print / e-delivery)","Log delivery"]],
+ ["408(b)(2) covered-provider disclosure",["Compile service & fee data","Produce disclosure","Deliver to plan fiduciary"]],
+ ["Blackout / SOX 306 notices",["Determine blackout event","Generate notice ≥30 days prior","Distribute & log"]],
+ ["Summary Annual Report distribution",["Receive SAR content","Distribute to participants","Log delivery"]],
+ ["Lifetime-income illustration",["Apply DOL assumptions","Calculate income estimates","Render on statement"]],
+ ["Notice fulfillment & proof-of-delivery",["Manage e-delivery consent","Distribute via channel","Capture delivery evidence","Retain audit trail"]]
+]},
+{n:"12",scope:"DC",name:"Reconciliation & Financial Control",tag:"Cross-cutting · Control",desc:"Daily balancing and money-movement controls.",procs:[
+ ["Daily cash reconciliation",["Pull plan cash activity","Compare to trust / custodian","Identify & clear breaks","Sign off"]],
+ ["Trust / custodial reconciliation",["Compare recordkeeping to custodian positions","Research differences","Adjust & confirm"]],
+ ["Share / unit reconciliation",["Sum participant units","Compare to omnibus holding","Resolve breaks"]],
+ ["Plan & participant-level reconciliation",["Sum participant accounts","Compare to plan assets","Resolve variance"]],
+ ["Suspense & clearing-account aging",["Report aged items","Assign research owners","Clear within SLA"]],
+ ["Float & interest management",["Track in-transit cash","Calculate earnings","Allocate / credit per policy"]],
+ ["Break / exception research & resolution",["Triage break","Root-cause analysis","Post correction","Document"]],
+ ["Money-movement controls",["Apply dual-control & limits","Run fraud checks","Approve & release"]]
+]},
+{n:"13",scope:"DC",name:"Fee & Revenue Administration",tag:"Cross-cutting · Control",desc:"Charging fees and managing revenue sharing.",procs:[
+ ["Recordkeeping fee calculation",["Determine basis (asset / per-head / wrap)","Calculate per period","Assess to accounts / plan"]],
+ ["Revenue-sharing / 12b-1 / sub-TA tracking",["Identify fund-paid revenue","Accrue & invoice fund companies","Collect & record"]],
+ ["Fee leveling / equalization",["Compute gross vs target net fee","Credit back excess revenue share","Reflect on accounts"]],
+ ["ERISA / revenue-credit account management",["Accrue revenue credits","Hold in plan account","Apply per fiduciary direction"]],
+ ["Participant & plan fee debiting",["Calculate fee","Debit account","Disclose on statement"]],
+ ["Invoicing & billing",["Generate sponsor invoice","Send & track","Collect & apply payment"]],
+ ["Advisor / TPA / broker compensation",["Calculate per agreement","Validate","Pay & report"]]
+]},
+{n:"14",scope:"DC",name:"Statements & Reporting",tag:"Value chain · Report",desc:"Participant, sponsor and trust reporting.",procs:[
+ ["Quarterly participant statements",["Snapshot balances & activity","Apply fee disclosure","Render & distribute","Archive"]],
+ ["On-demand statements & confirms",["Trigger on transaction / request","Generate document","Deliver"]],
+ ["Plan-sponsor / fiduciary reporting",["Compile plan metrics","Build package / dashboard","Deliver to sponsor"]],
+ ["Trust & financial reporting",["Produce trust accounting","Reconcile","Deliver financials"]],
+ ["Annual plan-audit support package",["Assemble auditor request data","Provide confirmations & reports","Respond to follow-ups"]],
+ ["Regulatory & ad-hoc reporting",["Receive request","Extract & validate data","Deliver"]],
+ ["Advisor / aggregator data feeds",["Build outbound feed","Schedule & transmit","Confirm receipt"]]
+]},
+{n:"15",scope:"DC",name:"Asset Recovery, Missing Participants & Escheatment",tag:"Cross-cutting · Control",desc:"Finding people and returning or remitting their money.",procs:[
+ ["Death Master File (DMF) matching",["Run population against Death Master File","Confirm matches","Initiate death / beneficiary process"]],
+ ["Missing-participant search",["Identify lost / undeliverable participants","Engage search vendor","Update address or escalate"]],
+ ["Address scrubbing (NCOA)",["Submit population to NCOA","Apply verified updates","Flag undeliverable"]],
+ ["Uncashed-check escalation",["Age uncashed checks","Conduct outreach","Reissue or escheat"]],
+ ["Escheatment / unclaimed-property reporting",["Apply state dormancy rules","Perform due-diligence outreach","Remit to state & report"]]
+]},
+{n:"16",scope:"DC",name:"Operational Backbone & Controls",tag:"Cross-cutting · Control",desc:"The infrastructure that supports every domain.",procs:[
+ ["Workflow & case management",["Intake work item","Classify & route","Track against SLA","Close & report"]],
+ ["Document imaging & records retention",["Capture & index document","Apply retention schedule","Archive / dispose per ERISA"]],
+ ["NIGO management",["Detect deficiency","Return with reasons","Track resubmission","Resolve"]],
+ ["Data governance & quality controls",["Define data standards","Monitor quality metrics","Remediate issues"]],
+ ["Fraud, AML & cybersecurity monitoring",["Monitor transactions & logins","Flag suspicious activity","Investigate & hold","File reports"]],
+ ["SOC 1 / SOC 2 controls & audit",["Maintain control matrix","Gather evidence","Support auditor","Remediate findings"]],
+ ["Business continuity / disaster recovery",["Maintain BCP / DR plans","Run tests","Update gaps"]],
+ ["Vendor & sub-custodian management",["Onboard & assess vendor","Monitor SLAs & risk","Conduct periodic reviews"]],
+ ["Regulatory change management",["Monitor legislation / regulation (e.g. SECURE 2.0)","Assess impact","Implement changes","Validate"]]
+]},
+
+/* ---------------- DEFINED BENEFIT ---------------- */
+{n:"17",scope:"DB",name:"DB Plan Setup & Data Management",tag:"DB · Foundation",desc:"Standing up the DB plan and its census/service data.",procs:[
+ ["DB plan-provision coding",["Abstract benefit formula, accrual rate, retirement ages, factors & COLA","Code provisions into pension-administration system","Validate against plan document","Obtain sign-off"]],
+ ["Census & service-data collection",["Receive employer census / payroll history","Validate hours & service","Load to participant records","Reconcile exceptions"]],
+ ["Salary / compensation history maintenance",["Capture annual pensionable earnings","Apply 401(a)(17) compensation cap","Maintain final-average-earnings components","Audit"]],
+ ["Service crediting (vesting & benefit service)",["Compute eligibility, vesting & benefit service","Apply break-in-service rules","Credit prior / purchased service","Update accruals"]]
+]},
+{n:"18",scope:"DB",name:"DB Benefit Calculation",tag:"DB · Calculation",desc:"Turning service and pay into an accrued pension benefit.",procs:[
+ ["Accrued-benefit calculation",["Gather service & earnings data","Apply benefit formula","Compute accrued monthly benefit","Validate result"]],
+ ["Final average earnings computation",["Select FAE period (e.g. high-3 / high-5)","Apply compensation cap","Compute average","Feed to benefit formula"]],
+ ["Optional-form conversion",["Determine available forms (life, J&S, certain & life, lump sum)","Apply actuarial conversion factors","Compute each option amount","Present to participant"]],
+ ["Early / late retirement adjustment",["Determine commencement vs normal retirement age","Apply early-reduction / late-increase factors","Recompute benefit"]],
+ ["Relative-value disclosure",["Compute relative value of each payment form","Generate disclosure","Deliver with election kit"]]
+]},
+{n:"19",scope:"DB",name:"DB Distributions & Annuity Administration",tag:"DB · Money Out",desc:"Commencing and adjusting pension benefits.",procs:[
+ ["Retirement benefit estimate",["Receive estimate request & assumed date","Run benefit projection","Produce estimate statement"]],
+ ["Benefit commencement processing",["Receive election & spousal consent","Verify eligibility & data","Finalize form & amount","Set up payment"]],
+ ["QJSA / QPSA spousal consent",["Provide notice & election window","Capture spousal waiver (notarized)","Validate & record"]],
+ ["417(e) lump-sum determination",["Apply prescribed segment rates & mortality table","Compute present value","Compare to plan-rate minimum"]],
+ ["Lump-sum window processing",["Identify eligible population","Issue offer & election kit","Process elections","Disburse lump sums"]],
+ ["Suspension of benefits (rehire)",["Detect rehired annuitant","Apply suspension rules & notice","Stop / adjust payments","Recompute on re-retirement"]],
+ ["Benefit recalculation / adjustment",["Identify triggering event (data fix, post-retirement accrual)","Recompute benefit","Process retroactive adjustment"]]
+]},
+{n:"20",scope:"DB",name:"DB Pension Payroll & Tax",tag:"DB · Annuitant Ops",desc:"Running the monthly pension payroll for retirees.",procs:[
+ ["Monthly annuitant payroll",["Compile annuitant roster","Calculate gross payments","Apply deductions & withholding","Disburse (ACH / check)"]],
+ ["COLA application",["Determine COLA per plan terms","Apply to annuity amounts","Notify annuitants"]],
+ ["Pension tax withholding (W-4P)",["Capture W-4P election","Apply federal / state withholding","Remit"]],
+ ["1099-R for annuitants",["Aggregate annual annuity payments","Produce & file 1099-R"]],
+ ["Death of annuitant / survivor transition",["Receive death notice","Stop payments & flag overpayment","Initiate survivor benefit (if J&S form)","Process survivor setup"]],
+ ["Overpayment identification & recovery",["Detect overpayment (late death notice / error)","Calculate amount","Pursue recovery per plan / EPCRS"]]
+]},
+{n:"21",scope:"DB",name:"DB Compliance & Funding Support",tag:"DB · Comply",desc:"Limits, restrictions and data support for the actuary/PBGC.",procs:[
+ ["415(b) maximum-benefit monitoring",["Compute annual benefit limit","Compare to accrued benefit","Restrict / adjust if over limit"]],
+ ["401(a)(17) compensation cap",["Apply annual compensation limit to FAE inputs","Recompute affected benefits"]],
+ ["Top-25 / restricted-benefit monitoring",["Identify top-25 highest-paid HCEs","Apply lump-sum restriction unless funding test met","Track restriction status"]],
+ ["DB minimum required distribution",["Identify RMD-age annuitants & deferred vesteds","Ensure timely commencement / payment","Track compliance"]],
+ ["PBGC premium data support",["Compile participant counts & unfunded-vested-benefit data","Provide to actuary / sponsor for premium filing"]],
+ ["Actuarial valuation data extract",["Extract census, service, earnings & benefit data","Validate & format","Deliver to enrolled actuary"]],
+ ["Form 5500 Schedule SB support",["Provide participant & benefit data","Support the actuary's Schedule SB","Reconcile"]],
+ ["Annual funding notice support",["Compile funding & participant data","Support notice production & distribution"]]
+]},
+{n:"22",scope:"AI",name:"AI Agent Opportunities",tag:"AI · Participant Lifecycle",desc:"Eight retrieval-governed AI agents  — each reduces a multi-day manual process to seconds by sitting atop FIS Omni nightly cycle reports.",procs:[
+ ["22.01 Eligibility Prediction Agent",["Pull census & hours data from Omni nightly report","Apply eligibility rules (age / 1,000-hour threshold) per plan document","Score each employee against next-30 / 60 / 90-day eligibility window","Generate proactive eligibility report for plan administrator","Flag auto-enrollment trigger dates","Send advance notice to HR / payroll — no manual tracking needed | TODAY: manual tracking  →  WITH AI: automated weekly report"]],
+ ["22.02 Hardship Adjudication Agent — BUILT (UC-16)",["Receive participant hardship withdrawal request","Retrieve plan-specific hardship provisions via semantic search (retrieval-governed)","Apply 4-check framework: safe harbor reason · vested balance · amount limit · documentation","Return APPROVED / DENIED / ESCALATE with full citation and rationale in <5 seconds","Log decision with plan provision and IRS regulation citations to immutable audit trail","Generate 1099-R signal data for tax reporting | TODAY: 3–5 days manual  →  WITH AI: 2–4 seconds"]],
+ ["22.03 Loan Eligibility Agent (UC-14 — next POC)",["Receive loan request with participant ID","Pull vested balance and outstanding loan balance from Omni","Calculate max eligible loan: lesser of 50% vested balance or $50,000 IRS cap","Check plan loan limit (some plans allow 1 loan; some allow 2)","Return eligibility, max amount, estimated EMI schedule, and deemed-distribution risk warning","Compare loan vs hardship withdrawal — show difference in penalty/tax impact | TODAY: 3–4 days turnaround  →  WITH AI: real-time"]],
+ ["22.04 RMD Identification & Calculation Agent (UC-17 candidate)",["Pull participant census data from Omni — identify all participants aged 72½ or older","Apply IRS Uniform Lifetime Table factor based on participant age","Calculate RMD = account balance ÷ life expectancy factor","Check prior-year distributions to verify compliance","Flag participants at risk of missing RMD deadline (25% excise tax on shortfall)","Generate audit-ready RMD compliance report for plan administrator | TODAY: manual IRS table lookup, risk of error  →  WITH AI: automated, every cycle"]],
+ ["22.05 Beneficiary Transparency Report Agent",["Pull participant beneficiary designations from Omni","Calculate projected payout to each beneficiary based on current account balance","Generate monthly/quarterly statement: balance + beneficiaries + % each receives as of today","Distribute to participant via email/portal","Capture participant acknowledgement (opens dispute-reduction audit trail)","Flag missing or outdated beneficiary designations | TODAY: beneficiary conflicts discovered only on death claim  →  WITH AI: monthly proactive transparency"]],
+ ["22.06 Omni Nightly Cycle Validation Agent",["Receive FIS Omni nightly batch output reports after each processing cycle","Parse reports: participant balances, vesting percentages, loan status, eligibility flags","Cross-validate against expected rules (contribution limits, vesting schedule, loan caps)","Generate exception report: flagged accounts with anomalies","Route exceptions to plan administrator for next-business-day review","Log validation run with timestamp and exception count | TODAY: next-day manual review  →  WITH AI: same-night automated sweep"]],
+ ["22.07 Tax Reporting Intelligence Agent",["Aggregate all distribution events from Omni reports throughout the year (hardship, loan offset, RMD, rollover)","Map each event to correct 1099-R distribution code","Calculate federal and state withholding obligations per distribution","Flag underpayment risk: compare withheld vs estimated tax liability","Generate pre-populated 1099-R data ready for filing via IRS FIRE/IRIS","Alert participants to Q4 distributions that may trigger estimated tax payments | TODAY: manual assembly; error-prone  →  WITH AI: automated, real-time"]],
+ ["22.08 Fund Performance Intelligence Agent",["Pull plan fund menu and historical NAV data from investment operations feed","Score each fund on trailing 1-year, 3-year, and 5-year risk-adjusted return","Compare fund scores against plan's QDIA benchmark","Flag underperforming funds relative to category peers","Generate quarterly fund review report for plan fiduciary committee","Surface top 3 alternative funds for each underperformer — support for menu review | TODAY: static lineup; advisor-dependent  →  WITH AI: quarterly AI-scored review"]],
+]},
+{n:"23",scope:"AI",name:"FIS TRP System Architecture",tag:"AI · Technology Layer",desc:"The actual internal system stack used by T. Rowe Price (TRP) on FIS Omni —  Every AI agent must integrate with one of these layers. Operations currently handled by Genpact L1 (BPO) and FIS L2.",procs:[
+ ["23.01 WRS — Workplace Retirement Site (participant portal)",["End-user web application used by employees/participants","Initiates all transactions: enrollment, deferral changes, hardship requests, loan requests, document uploads","Participant submits documents here (PDFs, images) which flow to Omni for validation","Pain point: participant submits incorrect or fraudulent documents — no pre-validation at point of upload","AI entry point: Document validation layer at WRS boundary — validate completeness and check for fraud BEFORE submission reaches back-end | Currently: no validation at portal level"]],
+ ["23.02 Omni — Core Recordkeeping Engine (FIS product)",["Primary FIS recordkeeping platform — the system of record for all participant accounts, balances, transactions","Receives all transactions from WRS and employer payroll files","Runs first-level validations: data type checks (e.g. date of birth must be date format, not string/boolean), eligibility rules, plan limits","'Load and go' mainframe job: employer census and contribution files are picked up automatically, parsed, validated, and loaded","Parks validated transactions for nightly cycle processing after market hours","Generates reports after each nightly cycle — these reports flow to downstream teams and systems","AI entry point: Layer on top of Omni nightly reports — read every report, cross-validate, flag exceptions before next business day | Currently: next-day manual review"]],
+ ["23.03 Omni — Back-end Workflow System",["Internal workflow engine that generates manual review tasks for operations teams","Activated when a transaction requires document validation: hardship withdrawals, primary residence loans","Creates a work item / queue entry for Genpact L1 operations staff to action","Operations staff opens the work item, reviews uploaded documents, marks valid/invalid, requests additional documents if needed","This is the HIGHEST MANUAL EFFORT STEP in the entire transaction lifecycle (Ravi's direct assessment)","AI entry point: UC-16 Hardship Adjudication Agent (BUILT) directly replaces this step for hardship. Primary Residence Loan document validator (next POC) does the same for loans | Currently: 100% manual Genpact L1 headcount"]],
+ ["23.04 Nightly Cycle — Mainframe Batch Job",["Runs every night after market close (cut-off approximately 3:00–4:00 PM EST)","Picks up all transactions parked in Omni during the day","Runs full, comprehensive validation suite — more thorough than Omni's first-pass","Posts successful transactions: money actually moves, account balances updated","Generates exception report for any transaction that fails — these exceptions must be manually researched and resolved","Key timing: if transaction is submitted after cut-off, it processes the following night — next-day settlement","AI entry point: AI reads exception report immediately after nightly cycle completes, triages exceptions, routes to correct team, pre-resolves common failures | Currently: next-business-day manual triage"]],
+ ["23.05 FRP — Fidelity Retirement Platform (next-gen Omni)",["The next-generation version of Omni currently in development at FIS","Will replace Omni as the core recordkeeping engine — same functional scope, modern architecture","AI integration strategy: build agent architecture to be platform-agnostic (same agents work on Omni today, FRP tomorrow)","Ravi confirmed FRP is the successor — useful signal for Will Hicks that AI investment is durable across platform migration"]],
+ ["23.06 Operations team structure (Genpact L1 / FIS L2)",["L1 — Genpact (third-party BPO): first-line document review in Omni. Validate documents submitted for hardship and primary residence loans. Flag issues, request additional documents, send back to participant.","L2 — FIS internal team: handle escalations from L1. More complex validations, exceptions, regulatory edge cases. Have direct Omni access.","Technology/Build (Ravi's team): build and maintain WRS, Omni configurations, Omni workflows. Not involved in day-to-day operations.","Pitch implication: AI agents replace Genpact L1 headcount for document validation — BPO cost reduction + faster turnaround. Frame for Will Hicks as operational efficiency, not just technology."]],
+]}
+];
+
+const grid=document.getElementById('grid');
+let totalProcs=0,totalSteps=0;
+DOMAINS.forEach(d=>{
+  const card=document.createElement('section');
+  card.className='domain'+(d.scope==='DB'?' db':d.scope==='AI'?' ai':'');
+  card.dataset.scope=d.scope;
+  let searchBlob=d.name+' '+d.desc+' '+d.tag;
+  let procsHtml='';
+  d.procs.forEach((p,i)=>{
+    totalProcs++; totalSteps+=p[1].length;
+    const code=d.n+'.'+String(i+1).padStart(2,'0');
+    searchBlob+=' '+p[0]+' '+p[1].join(' ');
+    let steps=p[1].map((s,j)=>`<li><span class="sn">${j+1}</span><span class="st">${s}</span></li>`).join('');
+    procsHtml+=`<li class="proc" data-s="${(p[0]+' '+p[1].join(' ')).toLowerCase()}">
+      <div class="p-head"><span class="pno">${code}</span><span class="ptxt">${p[0]}</span><span class="pc">${p[1].length} steps</span>
+      <span class="pchev"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="flow"><div class="flow-inner"><ol class="steps">${steps}</ol></div></div></li>`;
+  });
+  card.dataset.search=searchBlob.toLowerCase();
+  card.innerHTML=`
+    <div class="d-head">
+      <div class="d-num">${d.n}</div>
+      <div class="d-titles">
+        <div class="d-name">${d.name}<span class="scope-pill scope-${d.scope}">${d.scope}</span></div>
+        <div class="d-desc">${d.desc}</div>
+        <span class="d-tag">${d.tag} · ${d.procs.length} sub-processes</span>
+      </div>
+      <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>
+    </div>
+    <div class="d-body"><div class="d-body-inner"><ul class="procs">${procsHtml}</ul></div></div>`;
+  card.querySelector('.d-head').addEventListener('click',()=>card.classList.toggle('open'));
+  card.querySelectorAll('.proc .p-head').forEach(ph=>{
+    ph.addEventListener('click',e=>{e.stopPropagation();ph.parentElement.classList.toggle('open');});
+  });
+  grid.appendChild(card);
+});
+document.getElementById('domCount').textContent=DOMAINS.length;
+document.getElementById('procCount').textContent=totalProcs;
+document.getElementById('stepCount').textContent=totalSteps;
+
+const cards=[...document.querySelectorAll('.domain')];
+let scope='all';
+
+document.getElementById('expandAll').onclick=()=>cards.forEach(c=>{if(!c.classList.contains('hide')){c.classList.add('open');c.querySelectorAll('.proc').forEach(p=>p.classList.add('open'));}});
+document.getElementById('collapseAll').onclick=()=>cards.forEach(c=>{c.classList.remove('open');c.querySelectorAll('.proc').forEach(p=>p.classList.remove('open'));});
+
+document.getElementById('scopeSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  document.querySelectorAll('#scopeSeg button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); scope=b.dataset.scope; applyFilter();
+});
+
+const q=document.getElementById('q'),note=document.getElementById('filterNote'),noRes=document.getElementById('noRes');
+function esc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+q.addEventListener('input',applyFilter);
+
+function applyFilter(){
+  const term=q.value.trim().toLowerCase();
+  cards.forEach(c=>c.querySelectorAll('mark').forEach(m=>m.replaceWith(document.createTextNode(m.textContent))));
+  let shown=0;
+  const rx=term?new RegExp('('+esc(term)+')','gi'):null;
+  cards.forEach(c=>{
+    const scopeOk=(scope==='all'||c.dataset.scope===scope);
+    const termOk=(!term||c.dataset.search.includes(term));
+    if(scopeOk&&termOk){
+      c.classList.remove('hide'); shown++;
+      if(term){
+        c.classList.add('open');
+        c.querySelectorAll('.proc').forEach(p=>{
+          if(p.dataset.s.includes(term)){p.classList.add('open');}else{p.classList.remove('open');}
+        });
+        c.querySelectorAll('.d-name,.d-desc,.ptxt,.st').forEach(el=>{
+          if(el.textContent.toLowerCase().includes(term)) el.innerHTML=el.textContent.replace(rx,'<mark>$1</mark>');
+        });
+      }else{c.classList.remove('open');c.querySelectorAll('.proc').forEach(p=>p.classList.remove('open'));}
+    }else{c.classList.add('hide');c.classList.remove('open');}
+  });
+  note.textContent=(term||scope!=='all')?shown+' domain'+(shown===1?'':'s')+' shown':'';
+  noRes.style.display=shown?'none':'block';
+}
+
+
+
+
+function switchMainTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+}
+</script>
+</body>
+</html>

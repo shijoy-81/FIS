@@ -251,6 +251,60 @@
 
 
   #view-ai, #view-pf { padding: 24px 0 60px; }
+
+  /* ── Prototype tab ── */
+  #view-proto { padding: 32px 0 80px; }
+  .proto-header { margin-bottom: 28px; }
+  .proto-header h2 { font-family:"Fraunces",serif; font-size:28px; font-weight:500; color:var(--ink); margin:0 0 6px; }
+  .proto-header p { font-size:14px; color:var(--ink-soft); margin:0; max-width:70ch; }
+  .proto-badge { font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.2em; padding:3px 10px; border-radius:2px; background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7; display:inline-block; margin-bottom:10px; }
+  .proto-grid { display:grid; grid-template-columns:340px 1fr; gap:28px; align-items:start; }
+  .proto-left { display:flex; flex-direction:column; gap:16px; }
+  /* API key box */
+  .api-box { background:var(--card); border:1px solid var(--rule); border-radius:3px; padding:16px 18px; }
+  .api-box label { font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.14em; color:var(--ink-soft); display:block; margin-bottom:6px; text-transform:uppercase; }
+  .api-box input { width:100%; font-family:"IBM Plex Mono",monospace; font-size:12px; padding:8px 10px; border:1px solid var(--rule); border-radius:2px; background:var(--paper); color:var(--ink); }
+  .api-status { font-family:"IBM Plex Mono",monospace; font-size:10px; margin-top:5px; }
+  /* Scenario buttons */
+  .scenario-title { font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.14em; color:var(--ink-soft); text-transform:uppercase; margin-bottom:8px; }
+  .scenario-btn { width:100%; text-align:left; padding:10px 14px; border:1px solid var(--rule); border-radius:2px; background:var(--card); color:var(--ink); font-family:"IBM Plex Sans",sans-serif; font-size:13px; cursor:pointer; margin-bottom:6px; transition:border-color .15s, background .15s; display:flex; align-items:center; gap:10px; }
+  .scenario-btn:hover { background:var(--paper); border-color:var(--teal); }
+  .scenario-btn.active-scen { border-color:var(--teal); background:#f0faf8; }
+  .scen-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  /* Form */
+  .proto-form { background:var(--card); border:1px solid var(--rule); border-radius:3px; padding:20px; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:14px; }
+  .form-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+  .form-group { display:flex; flex-direction:column; gap:4px; }
+  .form-group label { font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.1em; color:var(--ink-soft); text-transform:uppercase; }
+  .form-group input, .form-group select, .form-group textarea { font-family:"IBM Plex Sans",sans-serif; font-size:13px; padding:7px 10px; border:1px solid var(--rule); border-radius:2px; background:var(--paper); color:var(--ink); width:100%; }
+  .form-group textarea { resize:vertical; min-height:70px; }
+  .submit-btn { width:100%; padding:12px; background:var(--ink); color:#fff; border:none; border-radius:2px; font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; cursor:pointer; margin-top:8px; transition:opacity .15s; }
+  .submit-btn:hover { opacity:.85; }
+  .submit-btn:disabled { opacity:.4; cursor:not-allowed; }
+  /* Result */
+  .result-wrap { margin-top:20px; }
+  .decision-banner { padding:16px 20px; border-radius:2px; text-align:center; font-family:"IBM Plex Mono",monospace; font-size:13px; letter-spacing:.2em; font-weight:600; color:#fff; margin-bottom:16px; }
+  .dec-APPROVED { background:#2f6b62; }
+  .dec-DENIED   { background:#8b2635; }
+  .dec-ESCALATE { background:#7a5c00; }
+  .result-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px; }
+  .r-metric { background:var(--card); border:1px solid var(--rule); border-radius:2px; padding:12px; text-align:center; }
+  .r-metric .val { font-family:"Fraunces",serif; font-size:22px; color:var(--ink); }
+  .r-metric .lbl { font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.1em; color:var(--ink-soft); margin-top:3px; }
+  .cite-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+  .cite-box { background:var(--card); border:1px solid var(--rule); border-radius:2px; padding:14px; }
+  .cite-box .cite-label { font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.12em; color:var(--ink-soft); text-transform:uppercase; margin-bottom:8px; }
+  .cite-item { font-size:12px; color:var(--ink-soft); padding:4px 0 4px 12px; border-left:2px solid var(--teal); margin-bottom:5px; line-height:1.5; }
+  .cite-item.irs { border-left-color:var(--brass); }
+  .rationale-box { background:#f5f0e8; border:1px solid var(--rule); border-radius:2px; padding:14px 16px; font-size:13px; color:var(--ink-soft); line-height:1.7; margin-bottom:12px; }
+  .missing-item { font-size:12px; color:#8b3a0a; background:#fff3ec; border:1px solid #f5c8a8; border-radius:2px; padding:4px 10px; margin:4px 0; display:inline-block; }
+  .spinner-wrap { text-align:center; padding:40px; color:var(--ink-soft); font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.1em; display:none; }
+  .audit-row { margin-top:16px; background:var(--card); border:1px solid var(--rule); border-radius:2px; padding:14px 16px; }
+  .audit-row label { font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.12em; color:var(--ink-soft); text-transform:uppercase; display:block; margin-bottom:6px; }
+  .audit-id { font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink); }
+  @media(max-width:800px){ .proto-grid{grid-template-columns:1fr;} .form-row{grid-template-columns:1fr 1fr;} .result-metrics{grid-template-columns:1fr 1fr;} }
+
 </style>
 </head>
 <body>
@@ -274,6 +328,7 @@
     <button class="mlink" id="m-swim"><span class="mn-dot"></span>Swimlanes</button>
     <button class="mlink" id="m-ai"><span class="mn-dot" style="background:var(--teal)"></span>AI Automation</button>
     <button class="mlink" id="m-pf"><span class="mn-dot" style="background:var(--plum)"></span>Process Flow</button>
+    <button class="mlink" id="m-proto"><span class="mn-dot" style="background:var(--brass)"></span>Prototype</button>
   </nav>
 
   <div class="controls">
@@ -573,6 +628,76 @@
 </div>
   </div>
 
+
+  <div id="view-proto" style="display:none">
+    <div class="proto-header">
+      <span class="proto-badge">LIVE AI DEMO · UC-16</span>
+      <h2>Hardship Withdrawal Adjudication Agent</h2>
+      <p>Enter your Anthropic API key, pick a scenario or fill in your own request, and watch the AI adjudicate in real time — retrieving plan provisions, applying IRS safe harbor rules, and returning a decision in seconds.</p>
+    </div>
+
+    <div class="proto-grid">
+      <!-- LEFT: key + scenarios -->
+      <div class="proto-left">
+        <div class="api-box">
+          <label>Anthropic API Key</label>
+          <input type="password" id="proto-key" placeholder="sk-ant-..." oninput="checkKey()">
+          <div class="api-status" id="key-status" style="color:var(--ink-soft)">Not set</div>
+        </div>
+
+        <div>
+          <div class="scenario-title">Load a demo scenario</div>
+          <div id="scen-btns"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: form + result -->
+      <div>
+        <div class="proto-form">
+          <div class="form-row">
+            <div class="form-group"><label>Participant Name</label><input id="f-name" value="Sarah Johnson"></div>
+            <div class="form-group"><label>Participant ID</label><input id="f-pid" value="P-2401-SJ"></div>
+            <div class="form-group"><label>Age</label><input type="number" id="f-age" value="45"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Account Balance ($)</label><input type="number" id="f-acct" value="125000"></div>
+            <div class="form-group"><label>Vested Balance ($)</label><input type="number" id="f-vest" value="125000"></div>
+            <div class="form-group"><label>Outstanding Loan ($)</label><input type="number" id="f-loan" value="0"></div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Hardship Reason</label>
+              <select id="f-reason">
+                <option>Medical Expenses</option>
+                <option>Purchase of Principal Residence</option>
+                <option>Post-Secondary Education</option>
+                <option>Prevention of Eviction/Foreclosure</option>
+                <option>Funeral/Burial Expenses</option>
+                <option>Home Repair — Casualty</option>
+                <option>FEMA Declared Disaster</option>
+                <option>Other/General Financial Hardship</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Amount Requested ($)</label><input type="number" id="f-amt" value="8500"></div>
+          </div>
+          <div class="form-group" style="margin-bottom:12px">
+            <label>Description of Hardship</label>
+            <textarea id="f-desc">Emergency appendectomy on 11/15/2024. Hospital bill for surgery and 3-day admission. Insurance denied $8,500 of the claim citing non-network facility.</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:4px">
+            <label>Documentation Submitted (one per line)</label>
+            <textarea id="f-docs">Itemized hospital bill ($8,500)
+Insurance EOB showing denial
+Physician discharge letter</textarea>
+          </div>
+          <button class="submit-btn" id="submit-btn" onclick="runAdj()">Submit for AI Adjudication</button>
+        </div>
+
+        <div class="spinner-wrap" id="proto-spinner">Agent is retrieving plan provisions and adjudicating…</div>
+        <div class="result-wrap" id="proto-result"></div>
+      </div>
+    </div>
+  </div>
 
 
   <footer>
@@ -1303,12 +1428,12 @@ function buildSwimlanes(){
 }
 (function(){
   const mInv=document.getElementById("m-inventory"), mSwim=document.getElementById("m-swim");
-  const mAI=document.getElementById("m-ai"), mPF=document.getElementById("m-pf");
+  const mAI=document.getElementById("m-ai"), mPF=document.getElementById("m-pf"), mProto=document.getElementById("m-proto");
   const vInv=document.getElementById("view-inventory"), vSwim=document.getElementById("view-swimlanes");
-  const vAI=document.getElementById("view-ai"), vPF=document.getElementById("view-pf");
+  const vAI=document.getElementById("view-ai"), vPF=document.getElementById("view-pf"), vProto=document.getElementById("view-proto");
   const controlsEl=document.querySelector(".controls");
-  const allViews=[vInv,vSwim,vAI,vPF];
-  const allBtns=[mInv,mSwim,mAI,mPF];
+  const allViews=[vInv,vSwim,vAI,vPF,vProto];
+  const allBtns=[mInv,mSwim,mAI,mPF,mProto];
 
   function hideAll(){
     allViews.forEach(v=>{if(v)v.style.display="none";});
@@ -1342,7 +1467,141 @@ function buildSwimlanes(){
     if(mPF) mPF.classList.add("active");
     window.scrollTo({top:0,behavior:"smooth"});
   };
+  if(mProto) mProto.onclick=()=>{
+    hideAll();
+    if(vProto){vProto.style.display="";}
+    if(mProto) mProto.classList.add("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
 })();
+
+
+/* ── Prototype Tab JS ── */
+const SCENARIOS = [{"color": "#2f6b62", "label": "Medical Emergency", "name": "Sarah Johnson", "pid": "P-2401-SJ", "age": 45, "acct": 125000, "vest": 125000, "loan": 0, "reason": "Medical Expenses", "amt": 8500, "desc": "Emergency appendectomy on 11/15/2024. Hospital bill for surgery and 3-day admission. Insurance denied $8,500 of the claim citing non-network facility.", "docs": "Itemized hospital bill ($8,500)\nInsurance EOB showing denial\nPhysician discharge letter"}, {"color": "#2f6b62", "label": "Foreclosure Prevention", "name": "Robert Chen", "pid": "P-2402-RC", "age": 38, "acct": 89000, "vest": 89000, "loan": 12000, "reason": "Prevention of Eviction/Foreclosure", "amt": 4200, "desc": "Received formal foreclosure notice from Wells Fargo Mortgage dated 12/01/2024. Three months behind due to layoff in September.", "docs": "Formal foreclosure notice from lender\n3 months mortgage statements"}, {"color": "#2f6b62", "label": "College Tuition", "name": "James Thompson", "pid": "P-2403-JT", "age": 48, "acct": 178000, "vest": 178000, "loan": 0, "reason": "Post-Secondary Education", "amt": 22000, "desc": "Daughter beginning first year at Ohio State University, Spring 2025. Tuition $15,000, room and board $7,000.", "docs": "OSU tuition bill \u2014 Spring 2025\nEnrollment verification letter\nRoom & board invoice"}, {"color": "#8b2635", "label": "Vague Hardship \u2014 DENY", "name": "Maria Rodriguez", "pid": "P-2404-MR", "age": 52, "acct": 245000, "vest": 245000, "loan": 0, "reason": "Other/General Financial Hardship", "amt": 35000, "desc": "Experiencing general financial difficulties. Need money to pay off credit cards and consolidate debt.", "docs": ""}, {"color": "#2f6b62", "label": "Funeral Expenses", "name": "Patricia Williams", "pid": "P-2405-PW", "age": 61, "acct": 58000, "vest": 58000, "loan": 5000, "reason": "Funeral/Burial Expenses", "amt": 12500, "desc": "Funeral expenses for husband who passed away November 28, 2024. Funeral home services, burial plot, and headstone.", "docs": "Funeral home invoice ($12,500)\nDeath certificate\nMarriage certificate"}];
+
+// Build scenario buttons
+(function(){
+  const container = document.getElementById('scen-btns');
+  if(!container) return;
+  SCENARIOS.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'scenario-btn';
+    btn.innerHTML = '<span class="scen-dot" style="background:' + s.color + '"></span>' + s.label;
+    btn.onclick = () => loadScenario(i);
+    container.appendChild(btn);
+  });
+})();
+
+function loadScenario(i) {
+  const s = SCENARIOS[i];
+  document.getElementById('f-name').value = s.name;
+  document.getElementById('f-pid').value  = s.pid;
+  document.getElementById('f-age').value  = s.age;
+  document.getElementById('f-acct').value = s.acct;
+  document.getElementById('f-vest').value = s.vest;
+  document.getElementById('f-loan').value = s.loan;
+  document.getElementById('f-reason').value = s.reason;
+  document.getElementById('f-amt').value  = s.amt;
+  document.getElementById('f-desc').value = s.desc;
+  document.getElementById('f-docs').value = s.docs;
+  document.getElementById('proto-result').innerHTML = '';
+  document.querySelectorAll('.scenario-btn').forEach((b,j) => b.classList.toggle('active-scen', i===j));
+}
+
+function checkKey() {
+  const k = document.getElementById('proto-key').value.trim();
+  const s = document.getElementById('key-status');
+  if(k.startsWith('sk-ant-') && k.length > 20) { s.textContent = '✓ Key set'; s.style.color = '#2f6b62'; }
+  else if(k.length > 0) { s.textContent = '✗ Invalid format'; s.style.color = '#8b2635'; }
+  else { s.textContent = 'Not set'; s.style.color = 'var(--ink-soft)'; }
+}
+
+async function runAdj() {
+  const key = document.getElementById('proto-key').value.trim();
+  if(!key || !key.startsWith('sk-ant-')) { alert('Please enter your Anthropic API key first.'); return; }
+  const desc = document.getElementById('f-desc').value.trim();
+  if(!desc) { alert('Please enter a hardship description.'); return; }
+
+  const p = {
+    name: document.getElementById('f-name').value,
+    pid:  document.getElementById('f-pid').value,
+    age:  +document.getElementById('f-age').value,
+    acct: +document.getElementById('f-acct').value,
+    vest: +document.getElementById('f-vest').value,
+    loan: +document.getElementById('f-loan').value,
+    reason: document.getElementById('f-reason').value,
+    amt:  +document.getElementById('f-amt').value,
+    desc: desc,
+    docs: document.getElementById('f-docs').value.trim().split('\n').filter(Boolean),
+  };
+  const avail = Math.max(p.vest - p.loan, 0);
+  const docsStr = p.docs.length ? p.docs.join(', ') : 'NONE SUBMITTED';
+
+  const userMsg = `PARTICIPANT HARDSHIP WITHDRAWAL REQUEST\n\nParticipant ID: ${p.pid}\nAge: ${p.age}\nAccount Balance: $${p.acct.toLocaleString()}\nVested Balance: $${p.vest.toLocaleString()}\nOutstanding Loans: $${p.loan.toLocaleString()}\nAvailable for Hardship: $${avail.toLocaleString()}\n\nHardship Reason: ${p.reason}\nAmount Requested: $${p.amt.toLocaleString()}\nDescription: ${p.desc}\nDocumentation: ${docsStr}\n\nRETRIEVED PLAN PROVISIONS:\nACME CORPORATION 401(k) RETIREMENT PLAN — HARDSHIP WITHDRAWAL PROVISIONS Article VIII\n\nSection 8.01 Availability: A Participant who has not separated from Service may receive a Hardship Distribution if (a) the distribution is on account of an immediate and heavy financial need and (b) the distribution is necessary to satisfy such need.\n\nSection 8.02 Safe Harbor Hardship Reasons:\n(a) MEDICAL EXPENSES under Code Section 213(d) for Participant, Spouse, children, dependents, or Primary Beneficiary. Includes unreimbursed medical expenses, deductibles, copays, procedures denied by insurance.\n(b) PURCHASE OF PRINCIPAL RESIDENCE — costs directly related to purchase (excluding mortgage payments).\n(c) POST-SECONDARY EDUCATION — tuition, fees, room and board for next 12 months for Participant, Spouse, children, dependents, or Primary Beneficiary.\n(d) PREVENTION OF EVICTION OR FORECLOSURE — payments to prevent eviction or foreclosure on principal residence. Formal written notice required.\n(e) FUNERAL AND BURIAL EXPENSES for deceased parent, Spouse, children, dependents, or Primary Beneficiary.\n(f) HOME REPAIR — CASUALTY — qualifying under Code Section 165 casualty deduction.\n(g) FEMA DECLARED DISASTER per SECURE 2.0 Act §331, effective January 26 2021.\n\nSection 8.03 Necessity: Amount must not exceed the need. Participant must certify inability to meet need from other resources. 6-month deferral suspension REMOVED effective January 1 2019.\n\nSection 8.04 Maximum Amount: Lesser of vested balance minus outstanding loan balance, or amount of the financial need including anticipated taxes.\n\nSection 8.05 Documentation Requirements:\n(a) Medical: itemized bills, EOB, or provider letter\n(b) Home purchase: signed purchase contract or closing statement\n(c) Education: tuition bill and enrollment verification\n(d) Eviction/foreclosure: formal written notice from lender/landlord\n(e) Funeral: funeral home invoice and relationship confirmation\n(f) Home repair: contractor estimate or insurance denial\n(g) FEMA: disaster declaration number and proof of affected area\n\nSection 8.06 Frequency: No more than one Hardship Distribution per Plan Year.\nSection 8.07 Vested Balance: Distributions from 100% vested amounts only.\nSection 8.08 Review: Plan Administrator shall approve, deny, or request info within 10 business days.\n\nAPPLICABLE IRS SAFE HARBOR RULES:\nIRS SAFE HARBOR HARDSHIP RULES — Treasury Regulation §1.401(k)-1(d)(3)\n\n1. MEDICAL EXPENSES (IRC §213(d)) — Treas. Reg §1.401(k)-1(d)(3)(iii)(B)(1): Includes copayments, deductibles, procedures denied by insurance, dental, vision.\n2. PURCHASE OF PRINCIPAL RESIDENCE — Treas. Reg §1.401(k)-1(d)(3)(iii)(B)(2): Excludes ongoing mortgage payments.\n3. POST-SECONDARY EDUCATION (NEXT 12 MONTHS) — Treas. Reg §1.401(k)-1(d)(3)(iii)(B)(3)\n4. EVICTION OR FORECLOSURE PREVENTION — Treas. Reg §1.401(k)-1(d)(3)(iii)(B)(4): Formal notice from landlord or lender required.\n5. FUNERAL AND BURIAL EXPENSES — Treas. Reg §1.401(k)-1(d)(3)(iii)(B)(5)\n6. REPAIR OF PRINCIPAL RESIDENCE (CASUALTY) — Treas. Reg §1.401(k)-1(d)(3)(iii)(B)(6)\n7. FEMA DECLARED DISASTER — SECURE 2.0 Act §331; IRC §72(t)(2)(B)\n\nNON-SAFE-HARBOR: General financial difficulty, debt consolidation, or unspecified financial need does NOT qualify. Must be DENIED.\n\nAMOUNT LIMIT (Treas. Reg §1.401(k)-1(d)(3)(iv)(A)): Distribution may not exceed immediate need including taxes and penalties.\n\nBased SOLELY on the above provisions and rules, adjudicate this request. Return ONLY the JSON.`;
+
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('proto-spinner').style.display = 'block';
+  document.getElementById('proto-result').innerHTML = '';
+  const t0 = Date.now();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01' },
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1200, system:'You are a retirement plan hardship withdrawal adjudication agent operating within a RETRIEVAL-GOVERNED AI framework.\nCORE PRINCIPLE: Make decisions EXCLUSIVELY based on the plan provisions and IRS rules provided. Do not use general knowledge to create or extend rules.\nDECISION FRAMEWORK:\n1. Is the stated hardship one of the 7 IRS safe harbor categories?\n2. Does the participant have sufficient vested balance minus outstanding loans?\n3. Does the requested amount exceed the stated need?\n4. Is required documentation submitted?\nAll 4 pass → APPROVE. Otherwise → DENY or ESCALATE.\nRespond ONLY with valid JSON:\n{\"decision\":\"APPROVED|DENIED|ESCALATE\",\"confidence\":0-100,\"rationale\":\"3-5 sentences citing provisions\",\"plan_provisions_cited\":[\"...\"],\"irs_rules_cited\":[\"...\"],\"missing_documentation\":[\"...\"],\"amount_approved\":number_or_null,\"conditions\":string_or_null,\"escalation_reason\":string_or_null,\"denial_reason\":string_or_null}', messages:[{role:'user',content:userMsg}] })
+    });
+    const data = await res.json();
+    const elapsed = ((Date.now()-t0)/1000).toFixed(1);
+    if(!res.ok) throw new Error(data.error?.message || 'API error');
+
+    let raw = data.content[0].text.trim().replace(/^```json\s*/m,'').replace(/^```\s*/m,'');
+    let r;
+    try { r = JSON.parse(raw); } catch(e) {
+      const m = raw.match(/\{[\s\S]*\}/);
+      r = m ? JSON.parse(m[0]) : {decision:'ESCALATE',confidence:0,rationale:'Parse error.',plan_provisions_cited:[],irs_rules_cited:[],missing_documentation:[],amount_approved:null,conditions:null,escalation_reason:'System parse error',denial_reason:null};
+    }
+
+    const auditId = Math.random().toString(36).substr(2,10).toUpperCase();
+    renderResult(r, elapsed, auditId, p);
+  } catch(e) {
+    document.getElementById('proto-result').innerHTML = '<div style="padding:14px;background:#fff3ec;border:1px solid #f5c8a8;border-radius:2px;color:#8b3a0a;font-size:13px;">Error: ' + e.message + '</div>';
+  } finally {
+    document.getElementById('submit-btn').disabled = false;
+    document.getElementById('proto-spinner').style.display = 'none';
+  }
+}
+
+function renderResult(r, elapsed, auditId, p) {
+  const dec = r.decision || 'ESCALATE';
+  const icons = {APPROVED:'✓ APPROVED',DENIED:'✗ DENIED',ESCALATE:'⚠ ESCALATE — HUMAN REVIEW'};
+  const amtStr = r.amount_approved ? '$' + r.amount_approved.toLocaleString() : '—';
+  const planCites = (r.plan_provisions_cited||[]).map(c=>`<div class="cite-item">${c}</div>`).join('') || '<div style="font-size:12px;color:var(--ink-soft)">None cited</div>';
+  const irsCites  = (r.irs_rules_cited||[]).map(c=>`<div class="cite-item irs">${c}</div>`).join('') || '<div style="font-size:12px;color:var(--ink-soft)">None cited</div>';
+  const missingHtml = (r.missing_documentation||[]).map(d=>`<span class="missing-item">⚠ ${d}</span>`).join('');
+  const extraNotes = [
+    r.conditions ? `<div style="padding:10px 14px;background:#f0faf8;border:1px solid #6EE7B7;border-radius:2px;font-size:12.5px;color:#065F46;margin-bottom:8px">Conditions: ${r.conditions}</div>` : '',
+    r.escalation_reason ? `<div style="padding:10px 14px;background:#fffbeb;border:1px solid #fcd34d;border-radius:2px;font-size:12.5px;color:#78350f;margin-bottom:8px">Escalation: ${r.escalation_reason}</div>` : '',
+    r.denial_reason ? `<div style="padding:10px 14px;background:#fff3ec;border:1px solid #f5c8a8;border-radius:2px;font-size:12.5px;color:#8b3a0a;margin-bottom:8px">Denial reason: ${r.denial_reason}</div>` : '',
+  ].join('');
+
+  document.getElementById('proto-result').innerHTML = `
+    <div class="decision-banner dec-${dec}">${icons[dec]}</div>
+    <div class="result-metrics">
+      <div class="r-metric"><div class="val">${r.confidence}%</div><div class="lbl">Confidence</div></div>
+      <div class="r-metric"><div class="val">${elapsed}s</div><div class="lbl">Decision time</div></div>
+      <div class="r-metric"><div class="val">${amtStr}</div><div class="lbl">Approved</div></div>
+      <div class="r-metric"><div class="val" style="font-size:13px;font-family:'IBM Plex Mono',monospace">${auditId}</div><div class="lbl">Audit ID</div></div>
+    </div>
+    <div class="cite-row">
+      <div class="cite-box"><div class="cite-label">Plan provisions retrieved</div>${planCites}</div>
+      <div class="cite-box"><div class="cite-label">IRS rules applied</div>${irsCites}</div>
+    </div>
+    <div class="rationale-box">${r.rationale}</div>
+    ${extraNotes}
+    ${missingHtml ? '<div style="margin-bottom:12px"><div style=\"font-family:IBM Plex Mono,monospace;font-size:10px;letter-spacing:.12em;color:var(--ink-soft);text-transform:uppercase;margin-bottom:6px\">Missing documentation</div>' + missingHtml + '</div>' : ''}
+    <div class="audit-row"><label>Audit trail</label><div class="audit-id">ID: ${auditId} · ${new Date().toLocaleString()} · Participant: ${p.pid} · Decision: ${dec} · Model: claude-sonnet-4-20250514</div></div>
+  `;
+}
 
 </script>
 </body>
